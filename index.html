@@ -1,0 +1,924 @@
+<html lang="en">
+<head>
+	<title>CodeCraft</title>
+	<!-- <link rel="shortcut icon" href="iconCoC.png">   -->
+	<style>
+		body {
+		background-color: #000000;
+		margin: 0px;
+		overflow: hidden;
+		user-select: none;
+		}
+	</style>
+</head>
+<script src="https://ajax.googleapis.com/ajax/libs/threejs/r69/three.js"></script>	
+<script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+<link rel="stylesheet" href="TechGreen.css">
+<!-- <script src="craftData.js"></script> -->
+<!-- <script src="three.min.js"></script> -->
+<body oncontextmenu="return false;" onselectstart="return false;">
+<center>	
+
+<div id='dialog'><br>
+	Game:<br>
+	<button id='reset'>Reset</button>
+	<button id='exit'>Exit</button>
+	<br><br>
+	Level:
+	<br><br>
+	Craft:<br>
+    <select name="speed" id="speed">
+      <option>Kernel</option>
+      <option>Quad</option>
+      <option>Fighter</option>
+    </select>
+    <br><br>
+	Control:
+	<button id='edit'>Edit program</button>
+
+</div>	
+</center>
+<script>
+  // $(function() {
+    $("#dialog").dialog({
+    	title:'System',
+    	position:{at:"left top"},
+    	// right:0,
+    	width:150,height:300,
+    	resizable:false,
+    	draggable:false,
+    	open: function(){
+    		$(".ui-dialog-titlebar-close").hide();
+    	}
+    });
+    $("#reset").button().click(function(){location.reload()});
+    $("#exit").button() 
+    $("#radio").buttonset().click(function(){console.log($("#radio:radio:checked").attr('id'))});
+    $("#speed").selectmenu({width:100});
+    $("#edit").button()
+  // });
+
+	var CoC={}
+	var camera, scene, renderer;
+	var windowX = window.innerWidth
+	   ,windowY = window.innerHeight;
+	var craft,runway,auxPlane,background;
+	var radius=200,thita=0.5,phai=-1.55;
+	var x0=0,y0=0;
+	var ts=new Date().getTime(),tt
+	var t0=ts,t1,dt
+	var s3d2=Math.sqrt(3)/2,s2d2=Math.sqrt(2)/2
+
+	var presentGate=0
+
+	// init(); to the end 
+	function init() {
+		camera = new THREE.PerspectiveCamera(40,windowX/windowY,5,10000);
+		// camera.position.set(500,100,-100)
+
+		scene = new THREE.Scene();
+		scene.fog = new THREE.FogExp2(0x000000,0.001);
+
+		renderer = new THREE.WebGLRenderer( { antialias: true } );
+		renderer.setSize( windowX, windowY );
+		renderer.setClearColor ('#000000',1)
+		document.body.appendChild( renderer.domElement );
+
+		// buildCraft(kernel)	
+		// buildCraft(quadcopter)
+		buildCraft(fighter)
+		scene.add(craft)
+		craft.position.set(0,20,-100)	
+		
+
+		buildRunway()
+		scene.add(runway)
+
+		setAuxPlane(-1,1,-1,100)
+		scene.add(auxPlane)
+
+		setBackground()
+		scene.add(background)
+
+		renderer.domElement.addEventListener('mousemove', mousemoveReact);
+		// document.addEventListener('keydown', ctrlKernel, false );
+		// document.addEventListener('keyup', ctrlKernel, false );
+		// document.addEventListener('keydown', ctrlQuad, false );
+		// document.addEventListener('keyup', ctrlQuad, false );
+		document.addEventListener('keydown', ctrlFight, false );
+		document.addEventListener('keyup', ctrlFight, false );
+
+
+		setInterval('render()',60)
+		setInterval('timer()',10)
+	}
+
+	function setBackground(){
+		background=new THREE.Object3D
+		var geometry = new THREE.Geometry();
+		for ( var i = 0; i < 20000; i ++ ) {
+			var vertex = new THREE.Vector3();
+			vertex.x = THREE.Math.randFloatSpread( 2000 );
+			vertex.y = THREE.Math.randFloatSpread( 2000 );
+			vertex.z = THREE.Math.randFloatSpread( 2000 );
+			if(vertex.length()>500){geometry.vertices.push( vertex );}
+		}
+		var stars=new THREE.PointCloud(geometry,new THREE.PointCloudMaterial({color:0xffffff}));
+		background.add(stars);
+	}
+
+	function render(){
+		camera.position.x=craft.position.x+radius*Math.cos(phai)*Math.cos(thita)
+		camera.position.z=craft.position.z+radius*Math.sin(phai)*Math.cos(thita)
+		camera.position.y=craft.position.y+radius*Math.sin(thita)		
+		camera.lookAt( craft.position );
+		background.position.copy(camera.position)
+		renderer.render( scene, camera );
+	}
+
+	function timer(){
+		var now=new Date()
+		var  XX = new THREE.Vector3( 1, 0, 0 )
+			,YY = new THREE.Vector3( 0, 1, 0 )
+			,ZZ = new THREE.Vector3( 0, 0, 1 );
+		var vector3=new THREE.Vector3() 
+		   ,quaternion=new THREE.Quaternion()
+		   ,scale=new THREE.Vector3()
+		   ,mC=new THREE.Matrix4();		
+		var dv,dx,drv,drx	
+		t1=now.getTime()
+		dt=(t1-t0)*0.001
+		tt=(t1-ts)*0.001
+		t0=t1
+		// dt*=2
+		if(runway.sensor(presentGate)==true){
+			presentGate+=1
+			if(presentGate==runway.children.length){
+				// craft.velocity.set(0,0,0)
+				presentGate=0
+			}
+			runway.resetColor(presentGate)
+		}
+
+		dv=craft.accelera.clone()
+		dv.multiplyScalar(dt)
+		craft.velocity.add(dv)
+		dx=craft.velocity.clone()
+		dx.multiplyScalar(dt)
+		craft.position.add(dx)
+
+		drv=craft.rotaAcce.clone()
+		drv.multiplyScalar(dt)
+		craft.rotaVelo.add(drv)
+		drx=craft.rotaVelo.clone()
+		drx.multiplyScalar(dt)
+		// console.log(drx)
+		mC.getInverse(craft.matrixWorld)
+		mC.clone().decompose(vector3,quaternion,scale)
+		drx.applyQuaternion(quaternion)
+		craft.rotateOnAxis(drx.clone().normalize(),drx.length())
+
+	}
+
+	function buildCraft(model){
+		var  XX = new THREE.Vector3( 1, 0, 0 )
+			,YY = new THREE.Vector3( 0, 1, 0 )
+			,ZZ = new THREE.Vector3( 0, 0, 1 );
+		var vector3=new THREE.Vector3() 
+		   ,quaternion=new THREE.Quaternion()
+		   ,scale=new THREE.Vector3()
+
+		model=new model
+		craft=new THREE.Object3D()
+
+		craft.mass=model.units.length
+		craft.massCenter=new THREE.Vector3(0,0,0)
+		craft.force=new THREE.Vector3(0,0,0)	
+		craft.accelera=new THREE.Vector3(0,0,0)		
+		craft.velocity=new THREE.Vector3(0,0,0)
+		craft.inertia=new THREE.Matrix4();
+		craft.torque=new THREE.Vector3(0,0,0)
+		craft.rotaAcce=new THREE.Vector3(0,0,0)
+		craft.rotaVelo=new THREE.Vector3(0,0,0)
+
+		craft.inertia.elements[0]=0
+		craft.inertia.elements[5]=0
+		craft.inertia.elements[10]=0
+
+		var units=new Array
+		for(var i=0;i<model.units.length;i++){
+			var material = new THREE.SpriteMaterial({
+				map:UnitTexture(model.units[i].type)
+			} );
+			units[i]=new THREE.Sprite( material );
+			units[i].position
+				.fromArray(model.units[i].position)
+			craft.add(units[i])
+			craft.massCenter.add(units[i].position)
+			craft.inertia.elements[0]+=
+				Math.pow(units[i].position.y,2)+Math.pow(units[i].position.z,2) 
+			craft.inertia.elements[1]-=units[i].position.x*units[i].position.y
+			craft.inertia.elements[2]-=units[i].position.x*units[i].position.z
+			craft.inertia.elements[5]+=
+				Math.pow(units[i].position.x,2)+Math.pow(units[i].position.z,2)
+			craft.inertia.elements[6]-=units[i].position.y*units[i].position.z
+			craft.inertia.elements[10]+=
+				Math.pow(units[i].position.x,2)+Math.pow(units[i].position.y,2)
+		}
+		craft.inertia.elements[4]=craft.inertia.elements[1]
+		craft.inertia.elements[8]=craft.inertia.elements[2]
+		craft.inertia.elements[9]=craft.inertia.elements[6]
+
+		craft.massCenter.multiplyScalar(1/craft.mass)
+		// craft.inertia.multiplyScalar(250)
+		// console.log(craft.inertia)
+		var invIner=new THREE.Matrix4().getInverse(craft.inertia.clone(),true)
+		console.log(craft.mass,craft.massCenter,craft.inertia)
+
+
+		var jets=new Array
+		for(var i=0;i<model.jets.length;i++){
+			var len=model.jets[i].len
+			   ,dir=new THREE.Vector3().fromArray(model.jets[i].dir)
+			   ,end=new THREE.Vector3().fromArray(model.jets[i].end)
+			   ,origin,vector
+			vector=dir.clone().multiplyScalar(model.jets[i].len*4)
+			origin=end.clone().sub(vector)
+			jets[i]=CoC.Arrow(origin,vector,0xff0000)
+			jets[i].name=model.jets[i].name
+			jets[i].force=dir.clone().multiplyScalar(len*200)
+			jets[i].torque=end.clone().cross(jets[i].force)
+			jets[i].visible=false
+			craft.add(jets[i])
+		}
+
+		craft.switchJets=function(name,onoff){
+			if(craft.getObjectByName(name).visible==onoff)
+			{return}
+			craft.getObjectByName(name).visible=onoff
+			craft.force.set(0,0,0)
+			craft.torque.set(0,0,0)
+			for(var i=0;i<model.jets.length;i++){
+				if(jets[i].visible==false){continue}
+				craft.force.add(
+					jets[i].force.clone()				   
+				)
+				craft.torque.add(
+					jets[i].torque.clone()
+				)
+			}
+			craft.matrixWorld.decompose(vector3,quaternion,scale)
+			craft.accelera=craft.force.divideScalar(craft.mass)
+			craft.rotaAcce=craft.torque.applyMatrix4(invIner)
+			craft.accelera.applyQuaternion(quaternion)
+			craft.rotaAcce.applyQuaternion(quaternion)
+		}
+	}
+
+	function buildRunway(){
+		var gates=[]
+		runway=new THREE.Object3D
+
+		for(n=0;n<100;n++){
+			gates[n]=setGates([0,20,n*50],[0,0,n*0.2,'XYZ'])
+			runway.add(gates[n])
+		}
+ 
+
+		runway.sensor=function(presentGate){
+			var p=presentGate
+			var reP=new THREE.Vector3() 
+			// position relative to present gate
+			   ,quaternion=new THREE.Quaternion()
+			   ,scale=new THREE.Vector3()
+			   ,reV=craft.velocity.clone()
+
+			runway.updateMatrixWorld();  // !!!! runway
+			var mG = new THREE.Matrix4();
+			mG.getInverse(gates[p].matrixWorld)
+			// console.log(mG)
+			mG.clone().decompose(reP,quaternion,scale)
+			reV.applyQuaternion(quaternion)
+
+			reP=craft.position.clone().applyMatrix4(mG)
+	
+			// var rotation=new THREE.Quaternion()
+
+			if(Math.abs(reP.x)<15 && Math.abs(reP.y)<10 
+			&& reP.z>0 && reP.z<5 && reV.z>0){
+				console.log('pass gate',p)
+				// console.log(reV)
+				return true
+			}
+		}
+		runway.sensor(0)
+
+		runway.resetColor=function(presentGate){
+			var p=presentGate,i=0
+			for(g=0;g<gates.length;g++){
+				gates[g].visible=false
+			}
+			for(g=p;g<p+5;g++){
+				var color=new THREE.Color( 0, 0, 1-i*0.2)
+					color=new THREE.Color(1-i*0.2,0,1-i*0.2)
+				for(c=0;c<4;c++){
+					gates[g].visible=true
+					gates[g].children[c].material.color=color
+					// console.log(gates[g].children[c].material.color.getHSL())
+				}
+				i++
+			}
+		}
+		// runway.resetColor(0)
+	}
+
+	function setGates(position,euler){
+		var geometry,vertex,material,frame
+		var position,normal,arrow,lineColor=0xff00ff
+		var origin =new THREE.Vector3(0,0,0) 
+			,xAxis =new THREE.Vector3(7,0,0)
+			,yAxis =new THREE.Vector3(0,7,0)
+			,zAxis =new THREE.Vector3(0,0,7);		
+		
+		var gates=new THREE.Object3D
+		geometry=new THREE.Geometry();
+		vertex=new THREE.Vector3(-15,-10,0);
+		geometry.vertices.push( vertex );
+		vertex=new THREE.Vector3(15,-10,0);
+		geometry.vertices.push( vertex );
+		vertex=new THREE.Vector3(15,10,0);
+		geometry.vertices.push( vertex );
+		vertex=new THREE.Vector3(-15,10,0);
+		geometry.vertices.push( vertex );
+		vertex=new THREE.Vector3(-15,-10,0);
+		geometry.vertices.push( vertex );
+
+		material=new THREE.LineBasicMaterial({
+			color:lineColor,
+		})
+
+		frame = new THREE.Line(geometry,material)
+		gates.add(frame)
+
+		arrow=CoC.Arrow(origin,xAxis,0x00ffff)
+		gates.add(arrow)
+		arrow=CoC.Arrow(origin,yAxis,0xffff00)
+		gates.add(arrow)
+		arrow=CoC.Arrow(origin,zAxis,0xff00ff)
+		gates.add(arrow)
+
+		var  XX = new THREE.Vector3( 1, 0, 0 )
+			,YY = new THREE.Vector3( 0, 1, 0 )
+			,ZZ = new THREE.Vector3( 0, 0, 1 );
+
+		gates.position.fromArray(position)
+		gates.rotation.fromArray(euler)
+		// console.log(gates.rotation)
+		// gates.rotateOnAxis(XX,Math.PI*30/180)
+		// gates.rotateOnAxis(YY,Math.PI*30/180)
+		// gates.rotateOnAxis(XX,Math.PI*30/180)
+		// gates.rotateOnAxis(YY,Math.PI*30/180)
+
+		// console.log(m)
+
+		// console.log(gates)
+		return gates
+	}
+
+	CoC.Arrow=function(origin,vector,color,head){
+		var geometry,material
+		var arrow,end,length,twig1,twig2,twig3
+		var zz,perpen1,perpen2
+		var s3d2=Math.sqrt(3)/2
+		length=vector.length()
+		zz=new THREE.Vector3(0,0,1)
+
+		if(head==null){head=length*.3}
+		if(vector.clone().normalize().equals(zz) ||
+		   vector.clone().normalize().negate().equals(zz)){
+			perpen1=new THREE.Vector3(1,0,0)
+			perpen2=new THREE.Vector3(0,1,0)
+		}else{
+			perpen1=zz.clone().cross(vector).normalize()
+			perpen2=vector.clone().cross(perpen1).normalize()
+		}
+		end=origin.clone().add(vector)
+		twig1=origin.clone()
+		 	 .add(vector.clone().setLength(length-head))
+		 	 .add(perpen1.clone().setLength(.5*head/3.))
+		twig2=origin.clone()
+			 .add(vector.clone().setLength(length-head))
+			 .add(perpen1.clone().setLength(-.25*head/3.)) 
+			 .add(perpen2.clone().setLength(.5*s3d2*head/3.)) 
+		twig3=origin.clone()
+			 .add(vector.clone().setLength(length-head))
+			 .add(perpen1.clone().setLength(-.25*head/3.)) 
+			 .add(perpen2.clone().setLength(-.5*s3d2*head/3.)) 
+
+		geometry=new THREE.Geometry();
+		geometry.vertices.push(origin);
+		geometry.vertices.push(end);
+		geometry.vertices.push(twig1);
+		geometry.vertices.push(end);
+		geometry.vertices.push(twig2);
+		geometry.vertices.push(end);
+		geometry.vertices.push(twig3);
+		material=new THREE.LineBasicMaterial({
+			color:color,
+		})
+		arrow=new THREE.Line(geometry,material)
+		return arrow
+	}
+
+	function setAuxPlane(x1,x2,z1,z2){
+		var geometry,vertex,material,line
+		auxPlane = new THREE.Object3D
+		for(var i=x1*10;i<=x2*10;i++){
+			var j=0,k=0
+			var x=i*10,y=j*10,z=k*10
+			geometry=new THREE.Geometry();
+			vertex=new THREE.Vector3(x,y,z+z1*100);
+			geometry.vertices.push( vertex );
+			vertex=new THREE.Vector3(x,y,z+z2*100);
+			geometry.vertices.push( vertex );
+
+			lineColor=0x001100
+			if(i%10==0){lineColor=0x003300}
+			material=new THREE.LineBasicMaterial({
+				color:lineColor,
+			})
+			line = new THREE.Line(geometry,material)
+			auxPlane.add( line );
+		}
+		for(var k=z1*10;k<=z2*10;k++){
+			var j=0,i=0
+			var x=i*10,y=j*10,z=k*10
+			geometry=new THREE.Geometry();
+			vertex=new THREE.Vector3(x+x1*100,y,z);
+			geometry.vertices.push( vertex );
+			vertex=new THREE.Vector3(x+x2*100,y,z);
+			geometry.vertices.push( vertex );
+
+			lineColor=0x001100
+			if(k%10==0){lineColor=0x003300}
+			if(k%100==0){lineColor=0x005500}
+			// if(k==0||k==1000){lineColor=0xff0000}
+			// if(k%100==0){lineColor=0x00ffff}
+			material=new THREE.LineBasicMaterial({
+				color:lineColor,
+			})
+			line = new THREE.Line(geometry,material)
+			auxPlane.add( line );
+		}
+	}
+
+	function UnitTexture(kind){
+		var c1,c2 // color outside & inside
+		switch(kind){
+			case  1:c1='#ffffff'        ;break; // iron
+			case  2:c1='#333333'        ;break; // carbon
+			case  3:c1='#ff0000'        ;break; // heat vibrate
+			case  4:c1='#ffff00'        ;break; // electromagnetic
+			case  5:c1='#0000ff'        ;break; // grvity subspace
+
+			case  6:c1='#ff7575'        ;break; // steel
+			case  7:c1='#FFFF6F'        ;break; // jet
+			case  8:c1='deepskyblue'    ;break; // magnet
+			case  9:c1='sandybrown'     ;break; // inertia
+			case 10:c1='greenyellow'    ;break; // inertia
+			case 11:c1='mediumorchid'   ;break; // inertia
+
+			case 12:c1='silver'         ;break; // inertia
+
+			case 13:c1='#FF0000'        ;break; // inertia
+			case 14:c1='gold'           ;break; // inertia
+			case 15:c1='#2828FF'        ;break; // inertia
+			case 16:c1='orangered'      ;break; // inertia
+			case 17:c1='#00FF00'        ;break; // inertia
+			case 18:c1='#9F009F'        ;break; // inertia
+
+			case 19:c1='darkred'        ;break; // inertia
+			case 20:c1='#5B4B00'        ;break; // inertia
+			case 21:c1='#000079'        ;break; // inertia
+			case 22:c1='#842B00'        ;break; // inertia
+			case 23:c1='#006000'        ;break; // inertia
+			case 24:c1='#460046'        ;break; // inertia
+		}
+
+		var canvas=document.createElement('canvas');
+		canvas.width=100;canvas.height=100
+		var ctx=canvas.getContext('2d')
+		var texture=new THREE.Texture(canvas)
+		texture.needsUpdate=true;
+
+		var grd = ctx.createRadialGradient(35,35, 0, 50, 50, 90);
+		grd.addColorStop(0,c1);
+		grd.addColorStop(1,'#000000');
+		ctx.arc(50,50,50, 0, 2 * Math.PI, false)
+		ctx.fillStyle=grd;
+		ctx.fill()
+
+		return texture
+	}
+
+	function mousemoveReact(event){
+		if(event.which==1){
+			renderer.domElement.style.cursor = "none"
+			x0=event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+			y0=event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+			phai+=x0*0.002
+			thita+=y0*0.002
+			if(thita>Math.PI*0.49){thita=Math.PI*0.49}
+			if(thita<-Math.PI*0.49){thita=-Math.PI*0.49}
+		}else{   
+			renderer.domElement.style.cursor = "crosshair"
+		}
+	}
+
+	function ctrlKernel(event){
+		trigger=false
+		if(event.type=='keydown'){trigger=true}
+
+		var key=String.fromCharCode(event.keyCode)
+		switch(key){
+		case 'A':
+			craft.switchJets('left',trigger);break;
+		case 'F':
+			craft.switchJets('right',trigger);break;
+		case 'E':
+			craft.switchJets('front',trigger);break;
+		case 'D':
+			craft.switchJets('back',trigger);break;
+		case 'W':
+			craft.switchJets('up',trigger);break;
+		case 'S':
+			craft.switchJets('down',trigger);break;
+		}
+	}
+
+	function ctrlQuad(event){
+		trigger=false
+		if(event.type=='keydown'){trigger=true}
+
+		var key=String.fromCharCode(event.keyCode)
+		switch(key){
+		case 'A':
+			craft.switchJets('left-up',trigger);
+			craft.switchJets('right-down',trigger);
+			break;
+		case 'F':
+			craft.switchJets('left-down',trigger);
+			craft.switchJets('right-up',trigger);
+			break;
+		case 'E':
+			craft.switchJets('front-up',trigger);
+			craft.switchJets('back-down',trigger);
+			break;
+		case 'D':
+			craft.switchJets('front-down',trigger);
+			craft.switchJets('back-up',trigger);
+			break;
+		case 'W':
+			craft.switchJets('left-down',trigger);
+			craft.switchJets('right-down',trigger);
+			craft.switchJets('front-down',trigger);
+			craft.switchJets('back-down',trigger);
+			break;
+		case 'S':
+			craft.switchJets('left-up',trigger);
+			craft.switchJets('right-up',trigger);
+			craft.switchJets('front-up',trigger);
+			craft.switchJets('back-up',trigger);
+			break;
+		}
+	}
+
+	function ctrlFight(event){
+		trigger=false
+		if(event.type=='keydown'){trigger=true}
+
+		var key=String.fromCharCode(event.keyCode)
+		switch(key){
+		case 'A':
+			craft.switchJets('left-down',trigger);
+			craft.switchJets('right-up',trigger);break;
+		case 'F':
+			craft.switchJets('left-up',trigger);
+			craft.switchJets('right-down',trigger);break;
+		case 'E':
+			craft.switchJets('back-1',trigger);
+			craft.switchJets('back-2',trigger);
+			craft.switchJets('back-3',trigger);
+			craft.switchJets('back-4',trigger);break;
+		case 'D':
+			craft.switchJets('left-1',trigger);
+			craft.switchJets('right-1',trigger);
+			craft.switchJets('up',trigger);
+			craft.switchJets('down',trigger);break;
+		case 'W':
+			craft.switchJets('up',trigger);
+			craft.switchJets('back-0',trigger);break;
+		case 'S':
+			craft.switchJets('down',trigger);
+			craft.switchJets('back-0',trigger);break;
+		case 'Q':
+			craft.switchJets('left-1',trigger);
+			craft.switchJets('back-0',trigger);break;	
+		case 'R':
+			craft.switchJets('right-1',trigger);
+			craft.switchJets('back-0',trigger);break;
+		}		
+	}
+
+	function kernel(){
+		units=[
+		//	locator gyroscope
+		{position:[ 0, 0, 0],type:17,color:'#ff0000'},
+		{position:[ 1, 0, 0],type:17,color:'#ff0000'},
+		{position:[-1, 0, 0],type:17,color:'#ff0000'},
+		{position:[ 0, 1, 0],type:17,color:'#ff0000'},
+		{position:[ 0,-1, 0],type:17,color:'#ff0000'},
+		{position:[ 0, 0, 1],type:17,color:'#ff0000'},
+		{position:[ 0, 0,-1],type:17,color:'#ff0000'},
+		//	CPU
+		{position:[-1,-1,-1],type:14,color:'#ff0000'},
+		{position:[ 0,-1,-1],type:14,color:'#ff0000'},
+		{position:[ 1,-1,-1],type:14,color:'#ff0000'},
+		{position:[-1, 0,-1],type:14,color:'#ff0000'},
+		// {position:[ 0, 0,-1],type:14,color:'#ff0000'},
+		{position:[ 1, 0,-1],type:14,color:'#ff0000'},
+		{position:[-1, 1,-1],type:14,color:'#ff0000'},
+		{position:[ 0, 1,-1],type:14,color:'#ff0000'},
+		{position:[ 1, 1,-1],type:14,color:'#ff0000'},
+
+		{position:[-1,-1, 0],type:14,color:'#ff0000'},
+		// {position:[ 0,-1, 0],type:14,color:'#ff0000'},
+		{position:[ 1,-1, 0],type:14,color:'#ff0000'},
+		{position:[-1, 0, 0],type:14,color:'#ff0000'},
+		// {position:[ 0, 0, 0],type:14,color:'#ff0000'},
+		{position:[ 1, 0, 0],type:14,color:'#ff0000'},
+		{position:[-1, 1, 0],type:14,color:'#ff0000'},
+		// {position:[ 0, 1, 0],type:14,color:'#ff0000'},
+		{position:[ 1, 1, 0],type:14,color:'#ff0000'},
+
+		{position:[-1,-1, 1],type:14,color:'#ff0000'},
+		{position:[ 0,-1, 1],type:14,color:'#ff0000'},
+		{position:[ 1,-1, 1],type:14,color:'#ff0000'},
+		{position:[-1, 0, 1],type:14,color:'#ff0000'},
+		// {position:[ 0, 0, 1],type:14,color:'#ff0000'},
+		{position:[ 1, 0, 1],type:14,color:'#ff0000'},
+		{position:[-1, 1, 1],type:14,color:'#ff0000'},
+		{position:[ 0, 1, 1],type:14,color:'#ff0000'},
+		{position:[ 1, 1, 1],type:14,color:'#ff0000'},
+		//	jets
+		{position:[ 0, 0,-3],type: 6,color:'#ff0000'},
+		{position:[ 0, 0,-2],type: 9,color:'#ff0000'},
+		{position:[ 0, 0, 3],type: 6,color:'#ff0000'},
+		{position:[ 0, 0, 2],type: 9,color:'#ff0000'},
+		{position:[ 0,-3, 0],type: 6,color:'#ff0000'},
+		{position:[ 0,-2, 0],type: 9,color:'#ff0000'},
+		{position:[ 0, 3, 0],type: 6,color:'#ff0000'},
+		{position:[ 0, 2, 0],type: 9,color:'#ff0000'},
+		{position:[-3, 0, 0],type: 6,color:'#ff0000'},
+		{position:[-2, 0, 0],type: 9,color:'#ff0000'},
+		{position:[ 3, 0, 0],type: 6,color:'#ff0000'},
+		{position:[ 2, 0, 0],type: 9,color:'#ff0000'},
+		]
+		jets=[
+		{name:'up'   ,len:2,dir:[ 0, 1, 0],end:[ 0,-4, 0]},
+		{name:'down' ,len:2,dir:[ 0,-1, 0],end:[ 0, 4, 0]},
+		{name:'left' ,len:2,dir:[ 1, 0, 0],end:[-4, 0, 0]},
+		{name:'right',len:2,dir:[-1, 0, 0],end:[ 4, 0, 0]},
+		{name:'front',len:2,dir:[ 0, 0, 1],end:[ 0, 0,-4]},
+		{name:'back' ,len:2,dir:[ 0, 0,-1],end:[ 0, 0, 4]},
+		]
+		return {units:units,jets:jets}
+	}
+
+	function quadcopter(){
+		var r=0.5/Math.sin(Math.PI*22.5/180)
+		   ,d=r*Math.sin(Math.PI*45/180)
+		units=[
+		//	locator gyroscope
+		{position:[ 0, 0, 0],type:17,color:'#ff0000'},
+		{position:[ 1, 0, 0],type:17,color:'#ff0000'},
+		{position:[-1, 0, 0],type:17,color:'#ff0000'},
+		{position:[ 0, 1, 0],type:17,color:'#ff0000'},
+		{position:[ 0,-1, 0],type:17,color:'#ff0000'},
+		{position:[ 0, 0, 1],type:17,color:'#ff0000'},
+		{position:[ 0, 0,-1],type:17,color:'#ff0000'},
+		//	CPU
+		{position:[-1,-1,-1],type:14,color:'#ff0000'},
+		{position:[ 0,-1,-1],type:14,color:'#ff0000'},
+		{position:[ 1,-1,-1],type:14,color:'#ff0000'},
+		{position:[-1, 0,-1],type:14,color:'#ff0000'},
+		// {position:[ 0, 0,-1],type:14,color:'#ff0000'},
+		{position:[ 1, 0,-1],type:14,color:'#ff0000'},
+		{position:[-1, 1,-1],type:14,color:'#ff0000'},
+		{position:[ 0, 1,-1],type:14,color:'#ff0000'},
+		{position:[ 1, 1,-1],type:14,color:'#ff0000'},
+
+		{position:[-1,-1, 0],type:14,color:'#ff0000'},
+		// {position:[ 0,-1, 0],type:14,color:'#ff0000'},
+		{position:[ 1,-1, 0],type:14,color:'#ff0000'},
+		{position:[-1, 0, 0],type:14,color:'#ff0000'},
+		// {position:[ 0, 0, 0],type:14,color:'#ff0000'},
+		{position:[ 1, 0, 0],type:14,color:'#ff0000'},
+		{position:[-1, 1, 0],type:14,color:'#ff0000'},
+		// {position:[ 0, 1, 0],type:14,color:'#ff0000'},
+		{position:[ 1, 1, 0],type:14,color:'#ff0000'},
+
+		{position:[-1,-1, 1],type:14,color:'#ff0000'},
+		{position:[ 0,-1, 1],type:14,color:'#ff0000'},
+		{position:[ 1,-1, 1],type:14,color:'#ff0000'},
+		{position:[-1, 0, 1],type:14,color:'#ff0000'},
+		// {position:[ 0, 0, 1],type:14,color:'#ff0000'},
+		{position:[ 1, 0, 1],type:14,color:'#ff0000'},
+		{position:[-1, 1, 1],type:14,color:'#ff0000'},
+		{position:[ 0, 1, 1],type:14,color:'#ff0000'},
+		{position:[ 1, 1, 1],type:14,color:'#ff0000'},
+
+		// 4 axis jets
+		{position:[ 0, 0,-2],type:12,color:'#ff0000'},
+		{position:[ 0, 0,-3],type:12,color:'#ff0000'},
+		{position:[ 0, 0,-4],type:12,color:'#ff0000'},
+		{position:[ 0, 1,-4],type: 9,color:'#ff0000'},
+		{position:[ 0, 2,-4],type: 6,color:'#ff0000'},
+		{position:[ 0,-1,-4],type: 9,color:'#ff0000'},
+		{position:[ 0,-2,-4],type: 6,color:'#ff0000'},
+
+		{position:[ 0, 0, 2],type:12,color:'#ff0000'},
+		{position:[ 0, 0, 3],type:12,color:'#ff0000'},
+		{position:[ 0, 0, 4],type:12,color:'#ff0000'},
+		{position:[ 0, 1, 4],type: 9,color:'#ff0000'},
+		{position:[ 0, 2, 4],type: 6,color:'#ff0000'},
+		{position:[ 0,-1, 4],type: 9,color:'#ff0000'},
+		{position:[ 0,-2, 4],type: 6,color:'#ff0000'},		
+
+		{position:[-2, 0, 0],type:12,color:'#ff0000'},
+		{position:[-3, 0, 0],type:12,color:'#ff0000'},
+		{position:[-4, 0, 0],type:12,color:'#ff0000'},
+		{position:[-4, 1, 0],type: 9,color:'#ff0000'},
+		{position:[-4, 2, 0],type: 6,color:'#ff0000'},
+		{position:[-4,-1, 0],type: 9,color:'#ff0000'},
+		{position:[-4,-2, 0],type: 6,color:'#ff0000'},
+
+		{position:[ 2, 0, 0],type:12,color:'#ff0000'},
+		{position:[ 3, 0, 0],type:12,color:'#ff0000'},
+		{position:[ 4, 0, 0],type:12,color:'#ff0000'},
+		{position:[ 4, 1, 0],type: 9,color:'#ff0000'},
+		{position:[ 4, 2, 0],type: 6,color:'#ff0000'},
+		{position:[ 4,-1, 0],type: 9,color:'#ff0000'},
+		{position:[ 4,-2, 0],type: 6,color:'#ff0000'},
+		// 
+		]
+		jets=[
+		{name:'left-up' ,len:2,dir:[ 0,-1, 0],end:[ 4, 3, 0]},
+		{name:'right-up',len:2,dir:[ 0,-1, 0],end:[-4, 3, 0]},
+		{name:'front-up',len:2,dir:[ 0,-1, 0],end:[ 0, 3, 4]},
+		{name:'back-up' ,len:2,dir:[ 0,-1, 0],end:[ 0, 3,-4]},
+		{name:'left-down' ,len:2,dir:[ 0, 1, 0],end:[ 4,-3, 0]},
+		{name:'right-down',len:2,dir:[ 0, 1, 0],end:[-4,-3, 0]},
+		{name:'front-down',len:2,dir:[ 0, 1, 0],end:[ 0,-3, 4]},
+		{name:'back-down' ,len:2,dir:[ 0, 1, 0],end:[ 0,-3,-4]},
+		]
+		return {units:units,jets:jets}
+	}
+
+	function fighter(){
+		var s3d2=Math.sqrt(3)/2
+		   ,s2ds3=Math.sqrt(2)/Math.sqrt(3)
+		   ,s2d2=Math.sqrt(2)/2
+		units=[
+		//	locator gyroscope
+		{position:[ 0, 0, 0],type:17,color:'#ff0000'},
+		{position:[ 1, 0, 0],type:17,color:'#ff0000'},
+		{position:[-1, 0, 0],type:17,color:'#ff0000'},
+		{position:[ 0, 1, 0],type:17,color:'#ff0000'},
+		{position:[ 0,-1, 0],type:17,color:'#ff0000'},
+		{position:[ 0, 0, 1],type:17,color:'#ff0000'},
+		{position:[ 0, 0,-1],type:17,color:'#ff0000'},
+		//	CPU
+		{position:[-1,-1,-1],type:14,color:'#ff0000'},
+		{position:[ 0,-1,-1],type:14,color:'#ff0000'},
+		{position:[ 1,-1,-1],type:14,color:'#ff0000'},
+		{position:[-1, 0,-1],type:14,color:'#ff0000'},
+		// {position:[ 0, 0,-1],type:14,color:'#ff0000'},
+		{position:[ 1, 0,-1],type:14,color:'#ff0000'},
+		{position:[-1, 1,-1],type:14,color:'#ff0000'},
+		{position:[ 0, 1,-1],type:14,color:'#ff0000'},
+		{position:[ 1, 1,-1],type:14,color:'#ff0000'},
+
+		{position:[-1,-1, 0],type:14,color:'#ff0000'},
+		// {position:[ 0,-1, 0],type:14,color:'#ff0000'},
+		{position:[ 1,-1, 0],type:14,color:'#ff0000'},
+		{position:[-1, 0, 0],type:14,color:'#ff0000'},
+		// {position:[ 0, 0, 0],type:14,color:'#ff0000'},
+		{position:[ 1, 0, 0],type:14,color:'#ff0000'},
+		{position:[-1, 1, 0],type:14,color:'#ff0000'},
+		// {position:[ 0, 1, 0],type:14,color:'#ff0000'},
+		{position:[ 1, 1, 0],type:14,color:'#ff0000'},
+
+		{position:[-1,-1, 1],type:14,color:'#ff0000'},
+		{position:[ 0,-1, 1],type:14,color:'#ff0000'},
+		{position:[ 1,-1, 1],type:14,color:'#ff0000'},
+		{position:[-1, 0, 1],type:14,color:'#ff0000'},
+		// {position:[ 0, 0, 1],type:14,color:'#ff0000'},
+		{position:[ 1, 0, 1],type:14,color:'#ff0000'},
+		{position:[-1, 1, 1],type:14,color:'#ff0000'},
+		{position:[ 0, 1, 1],type:14,color:'#ff0000'},
+		{position:[ 1, 1, 1],type:14,color:'#ff0000'},
+		// left wing
+		{position:[ 1+s3d2, .5, 1],type: 9,color:'#ff0000'},
+		{position:[ 1+s3d2,-.5, 1],type: 6,color:'#ff0000'},
+		{position:[ 1+s3d2, .5, 0],type: 6,color:'#ff0000'},
+		{position:[ 1+s3d2,-.5, 0],type: 9,color:'#ff0000'},		
+		{position:[ 1+2*s3d2, 0, 1],type: 6,color:'#ff0000'},
+		{position:[ 1+2*s3d2, 0,-0],type: 9,color:'#ff0000'},
+		{position:[ 2+2*s3d2, 0, 1],type: 9,color:'#ff0000'},
+		{position:[ 2+2*s3d2, 0,-0],type: 6,color:'#ff0000'},
+		{position:[ 2+3*s3d2, 0, 0.5],type: 9,color:'#ff0000'},
+		{position:[ 2+3*s3d2, 0,-0.5],type: 6,color:'#ff0000'},
+		// right wing
+		{position:[-1-s3d2, .5, 1],type: 6,color:'#ff0000'},
+		{position:[-1-s3d2,-.5, 1],type: 9,color:'#ff0000'},
+		{position:[-1-s3d2, .5, 0],type: 9,color:'#ff0000'},
+		{position:[-1-s3d2,-.5, 0],type: 6,color:'#ff0000'},		
+		{position:[-1-2*s3d2, 0, 1],type: 6,color:'#ff0000'},
+		{position:[-1-2*s3d2, 0,-0],type: 9,color:'#ff0000'},
+		{position:[-2-2*s3d2, 0, 1],type: 9,color:'#ff0000'},
+		{position:[-2-2*s3d2, 0,-0],type: 6,color:'#ff0000'},
+		{position:[-2-3*s3d2, 0, 0.5],type: 9,color:'#ff0000'},
+		{position:[-2-3*s3d2, 0,-0.5],type: 6,color:'#ff0000'},
+		// up jets
+		{position:[ 0, 2, 0],type: 9,color:'#ff0000'},
+		{position:[ 0, 2, 1],type: 6,color:'#ff0000'},
+		// {position:[ 0, 2,-2],type: 9,color:'#ff0000'},
+		// down jets
+		{position:[ 0,-2, 0],type: 9,color:'#ff0000'},
+		{position:[ 0,-2, 1],type: 6,color:'#ff0000'},
+		// {position:[ 0,-2,-2],type: 9,color:'#ff0000'},
+		// back jets
+		{position:[ 0, 0, -2],type:9,color:'#ff0000'},
+		{position:[ 0, 0, -3],type:6,color:'#ff0000'},
+		{position:[ 0, s3d2, -2.5],type:9,color:'#ff0000'},
+		{position:[ 0, s3d2, -3.5],type:6,color:'#ff0000'},
+		{position:[ 0,-s3d2, -2.5],type:9,color:'#ff0000'},
+		{position:[ 0,-s3d2, -3.5],type:6,color:'#ff0000'},
+		{position:[ s3d2,0, -2.5],type:9,color:'#ff0000'},
+		{position:[ s3d2,0, -3.5],type:6,color:'#ff0000'},
+		{position:[-s3d2,0, -2.5],type:9,color:'#ff0000'},
+		{position:[-s3d2,0, -3.5],type:6,color:'#ff0000'},
+		// camera
+		{position:[ 1,  0, 2],type:17,color:'#ff0000'},
+		{position:[ 0,  0, 2],type:17,color:'#ff0000'},
+		{position:[-1,  0, 2],type:17,color:'#ff0000'},		
+		{position:[ 0.5, s3d2, 2],type:17,color:'#ff0000'},
+		{position:[-0.5, s3d2, 2],type:17,color:'#ff0000'},
+		{position:[ 0.5,-s3d2, 2],type:17,color:'#ff0000'},
+		{position:[-0.5,-s3d2, 2],type:17,color:'#ff0000'},
+
+		{position:[ 1,  0, 3],type:17,color:'#ff0000'},
+		{position:[ 0,  0, 3],type:10,color:'#ff0000'},
+		{position:[-1,  0, 3],type:17,color:'#ff0000'},		
+		{position:[ 0.5, s3d2, 3],type:10,color:'#ff0000'},
+		{position:[-0.5, s3d2, 3],type:10,color:'#ff0000'},
+		{position:[ 0.5,-s3d2, 3],type:17,color:'#ff0000'},
+		{position:[-0.5,-s3d2, 3],type:17,color:'#ff0000'},
+
+		{position:[ .5,-s3d2/3, 3+s3d2],type:12,color:'#ff0000'},
+		{position:[-.5,-s3d2/3, 3+s3d2],type:12,color:'#ff0000'},
+		{position:[ 0,2*s3d2/3, 3+s3d2],type:12,color:'#ff0000'},
+		
+		// {position:[ 0, 0, 3+s3d2+s2ds3],type:12,color:'#ff0000'},
+		]
+		jets=[
+		{name:'left-up' ,len:2,dir:[ 0, 1, 0],end:[ 1+s3d2,-1.5, 1]},
+		{name:'left-down' ,len:2,dir:[ 0,-1, 0],end:[ 1+s3d2, 1.5, 0]},
+		{name:'left-1' ,len:2,dir:[ 0, 0,-1],end:[ 1+2*s3d2, 0, 2]},
+		// {name:'left-2' ,len:2,dir:[ 0, 0, 1],end:[ 3, 0,-1]},
+		// {name:'left-3' ,len:2,dir:[ 0, 0, 1],end:[ 3+s3d2, 0,-1.5]},
+
+		{name:'right-up' ,len:2,dir:[ 0, 1, 0],end:[-1-s3d2,-1.5, 0]},
+		{name:'right-down' ,len:2,dir:[ 0,-1, 0],end:[-1-s3d2, 1.5, 1]},
+		{name:'right-1' ,len:2,dir:[ 0, 0,-1],end:[-1-2*s3d2, 0, 2]},
+		// {name:'right-2' ,len:2,dir:[ 0, 0, 1],end:[-3, 0,-1]},
+		// {name:'right-3' ,len:2,dir:[ 0, 0, 1],end:[-3-s3d2, 0,-1.5]},
+
+		{name:'up' ,len:2,dir:[ 0, 0,-1],end:[ 0, 2, 2]},
+		{name:'down' ,len:2,dir:[ 0, 0,-1],end:[ 0,-2, 2]},
+
+		{name:'back-0' ,len:2,dir:[ 0, 0, 1],end:[ 0, 0, -4]},
+		{name:'back-1' ,len:2,dir:[ 0, 0, 1],end:[ 0, s3d2, -4.5]},
+		{name:'back-2' ,len:2,dir:[ 0, 0, 1],end:[ 0,-s3d2, -4.5]},
+		{name:'back-3' ,len:2,dir:[ 0, 0, 1],end:[ s3d2,0, -4.5]},
+		{name:'back-4' ,len:2,dir:[ 0, 0, 1],end:[-s3d2,0, -4.5]},
+		]
+		return {units:units,jets:jets}		
+	}
+
+	init();
+</script>
+</body>
+</html>

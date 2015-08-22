@@ -7,14 +7,13 @@
 		background-color: #000000;
 		margin: 0px;
 		overflow: hidden;
-		user-select: none;
 		}
 	</style>
 </head>
 <script src="https://ajax.googleapis.com/ajax/libs/threejs/r69/three.js"></script>	
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
-<link rel="stylesheet" href="TechGreen.css">
+<link rel="stylesheet" href="jquery-ui/TechGreen.css">
 <!-- <script src="craftData.js"></script> -->
 <!-- <script src="three.min.js"></script> -->
 <body oncontextmenu="return false;" onselectstart="return false;">
@@ -35,6 +34,7 @@
     </select>
     <br><br>
 	Control:
+	<button id='lock'>Lock pointer</button>
 	<button id='edit'>Edit program</button>
 
 </div>	
@@ -45,18 +45,29 @@
     	title:'System',
     	position:{at:"left top"},
     	// right:0,
-    	width:150,height:300,
+    	width:150,height:350,
     	resizable:false,
     	draggable:false,
     	open: function(){
     		$(".ui-dialog-titlebar-close").hide();
     	}
     });
-    $("#reset").button().click(function(){location.reload()});
+    $("#reset").button().click(function(){
+    	// location.reload()
+    	craft.accelera.set(0,0,0)
+    	craft.velocity.set(0,0,0)
+    	craft.position.set(0,20,-100)
+    	craft.rotaAcce.set(0,0,0)
+    	craft.rotaVelo.set(0,0,0)
+    	craft.rotation.set(0,0,0)
+    	presentGate=0
+    	runway.resetColor(0)
+    });
     $("#exit").button() 
     $("#radio").buttonset().click(function(){console.log($("#radio:radio:checked").attr('id'))});
     $("#speed").selectmenu({width:100});
-    $("#edit").button()
+    $("#lock").button().click(function(){renderer.domElement.requestPointerLock();});
+    $("#edit").button();
   // });
 
 	var CoC={}
@@ -90,7 +101,6 @@
 		buildCraft(fighter)
 		scene.add(craft)
 		craft.position.set(0,20,-100)	
-		
 
 		buildRunway()
 		scene.add(runway)
@@ -281,7 +291,7 @@
 		runway=new THREE.Object3D
 
 		for(n=0;n<100;n++){
-			gates[n]=setGates([0,20,n*50],[0,0,n*0.2,'XYZ'])
+			gates[n]=setGates([0,20,n*100],[0,0,0,'XYZ'])
 			runway.add(gates[n])
 		}
  
@@ -320,12 +330,10 @@
 				gates[g].visible=false
 			}
 			for(g=p;g<p+5;g++){
-				var color=new THREE.Color( 0, 0, 1-i*0.2)
-					color=new THREE.Color(1-i*0.2,0,1-i*0.2)
 				for(c=0;c<4;c++){
+					var hue=gates[g].children[c].material.color.getHSL().h
 					gates[g].visible=true
-					gates[g].children[c].material.color=color
-					// console.log(gates[g].children[c].material.color.getHSL())
+					gates[g].children[c].material.color.setHSL(hue,1,0.5-i*0.1)
 				}
 				i++
 			}

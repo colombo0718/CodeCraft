@@ -210,7 +210,8 @@
 	position: relative;
 	padding: 0;
 	line-height: normal;
-	margin-right: .1em;
+	/*margin-right: .1em;*/
+	margin:.1em 0em;
 	cursor: pointer;
 	vertical-align: middle;
 	text-align: center;

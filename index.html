@@ -12,47 +12,51 @@
 </head>
 <script src="https://ajax.googleapis.com/ajax/libs/threejs/r69/three.js"></script>	
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
-<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.4/jquery-ui.min.js"></script>
+<script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
 <link rel="stylesheet" href="jquery-ui/TechGreen.css">
+<script src='craftData.js'></script>
 <!-- <script src="craftData.js"></script> -->
 <!-- <script src="three.min.js"></script> -->
 <body oncontextmenu="return false;" onselectstart="return false;">
 <center>	
 
-<div id='dialog'><br>
+<div id='system'><br>
 	Game:<br>
-	<button id='reset'>Reset</button>
+	<button id='start'>Start</button>
+	<!-- <button id='reset'>Reset</button> -->
 	<button id='exit'>Exit</button>
 	<br><br>
 	Level:
 	<br><br>
 	Craft:<br>
-    <select name="speed" id="speed">
+    <select name="craft" id="craft">
       <option>Kernel</option>
       <option>Quad</option>
       <option>Fighter</option>
     </select>
     <br><br>
 	Control:
-	<button id='lock'>Lock pointer</button>
 	<button id='edit'>Edit program</button>
 
 </div>	
 </center>
 <script>
   // $(function() {
-    $("#dialog").dialog({
+    $("#system").dialog({
     	title:'System',
-    	position:{at:"left top"},
+    	position:{at:"center center"},
     	// right:0,
     	width:150,height:350,
     	resizable:false,
     	draggable:false,
     	open: function(){
     		$(".ui-dialog-titlebar-close").hide();
-    	}
+    	},
+		show:{effect: "fold",duration: 200},
+		hide:{effect: "fold",duration: 200}
     });
-    $("#reset").button().click(function(){
+    // $("#start").button() 
+    $("#start").button().click(function(){
     	// location.reload()
     	craft.accelera.set(0,0,0)
     	craft.velocity.set(0,0,0)
@@ -62,12 +66,21 @@
     	craft.rotation.set(0,0,0)
     	presentGate=0
     	runway.resetColor(0)
+    	// radius=200,thita=0.5,phai=-1.55;
+    	renderer.domElement.requestPointerLock = 
+			renderer.domElement.requestPointerLock ||
+			renderer.domElement.mozRequestPointerLock ||
+			renderer.domElement.webkitRequestPointerLock;
+		renderer.domElement.requestPointerLock()
+		$("#system").dialog('close')
     });
     $("#exit").button() 
     $("#radio").buttonset().click(function(){console.log($("#radio:radio:checked").attr('id'))});
-    $("#speed").selectmenu({width:100});
-    $("#lock").button().click(function(){renderer.domElement.requestPointerLock();});
-    $("#edit").button();
+    $("#craft").selectmenu({width:100});
+
+    $("#edit").button().click(function(){});
+
+
   // });
 
 	var CoC={}
@@ -95,7 +108,6 @@
 		renderer.setSize( windowX, windowY );
 		renderer.setClearColor ('#000000',1)
 		document.body.appendChild( renderer.domElement );
-
 		// buildCraft(kernel)	
 		// buildCraft(quadcopter)
 		buildCraft(fighter)
@@ -105,7 +117,7 @@
 		buildRunway()
 		scene.add(runway)
 
-		setAuxPlane(-1,1,-1,100)
+		setAuxPlane(-1,1,-1,10)
 		scene.add(auxPlane)
 
 		setBackground()
@@ -116,8 +128,8 @@
 		// document.addEventListener('keyup', ctrlKernel, false );
 		// document.addEventListener('keydown', ctrlQuad, false );
 		// document.addEventListener('keyup', ctrlQuad, false );
-		document.addEventListener('keydown', ctrlFight, false );
-		document.addEventListener('keyup', ctrlFight, false );
+		document.addEventListener('keydown', ctrlFight);
+		document.addEventListener('keyup', ctrlFight);
 
 
 		setInterval('render()',60)
@@ -261,7 +273,7 @@
 			jets[i].torque=end.clone().cross(jets[i].force)
 			jets[i].visible=false
 			craft.add(jets[i])
-		}
+		}	
 
 		craft.switchJets=function(name,onoff){
 			if(craft.getObjectByName(name).visible==onoff)
@@ -290,7 +302,7 @@
 		var gates=[]
 		runway=new THREE.Object3D
 
-		for(n=0;n<100;n++){
+		for(n=0;n<10;n++){
 			gates[n]=setGates([0,20,n*100],[0,0,0,'XYZ'])
 			runway.add(gates[n])
 		}
@@ -605,7 +617,6 @@
 	function ctrlFight(event){
 		trigger=false
 		if(event.type=='keydown'){trigger=true}
-
 		var key=String.fromCharCode(event.keyCode)
 		switch(key){
 		case 'A':
@@ -636,294 +647,11 @@
 		case 'R':
 			craft.switchJets('right-1',trigger);
 			craft.switchJets('back-0',trigger);break;
-		}		
-	}
-
-	function kernel(){
-		units=[
-		//	locator gyroscope
-		{position:[ 0, 0, 0],type:17,color:'#ff0000'},
-		{position:[ 1, 0, 0],type:17,color:'#ff0000'},
-		{position:[-1, 0, 0],type:17,color:'#ff0000'},
-		{position:[ 0, 1, 0],type:17,color:'#ff0000'},
-		{position:[ 0,-1, 0],type:17,color:'#ff0000'},
-		{position:[ 0, 0, 1],type:17,color:'#ff0000'},
-		{position:[ 0, 0,-1],type:17,color:'#ff0000'},
-		//	CPU
-		{position:[-1,-1,-1],type:14,color:'#ff0000'},
-		{position:[ 0,-1,-1],type:14,color:'#ff0000'},
-		{position:[ 1,-1,-1],type:14,color:'#ff0000'},
-		{position:[-1, 0,-1],type:14,color:'#ff0000'},
-		// {position:[ 0, 0,-1],type:14,color:'#ff0000'},
-		{position:[ 1, 0,-1],type:14,color:'#ff0000'},
-		{position:[-1, 1,-1],type:14,color:'#ff0000'},
-		{position:[ 0, 1,-1],type:14,color:'#ff0000'},
-		{position:[ 1, 1,-1],type:14,color:'#ff0000'},
-
-		{position:[-1,-1, 0],type:14,color:'#ff0000'},
-		// {position:[ 0,-1, 0],type:14,color:'#ff0000'},
-		{position:[ 1,-1, 0],type:14,color:'#ff0000'},
-		{position:[-1, 0, 0],type:14,color:'#ff0000'},
-		// {position:[ 0, 0, 0],type:14,color:'#ff0000'},
-		{position:[ 1, 0, 0],type:14,color:'#ff0000'},
-		{position:[-1, 1, 0],type:14,color:'#ff0000'},
-		// {position:[ 0, 1, 0],type:14,color:'#ff0000'},
-		{position:[ 1, 1, 0],type:14,color:'#ff0000'},
-
-		{position:[-1,-1, 1],type:14,color:'#ff0000'},
-		{position:[ 0,-1, 1],type:14,color:'#ff0000'},
-		{position:[ 1,-1, 1],type:14,color:'#ff0000'},
-		{position:[-1, 0, 1],type:14,color:'#ff0000'},
-		// {position:[ 0, 0, 1],type:14,color:'#ff0000'},
-		{position:[ 1, 0, 1],type:14,color:'#ff0000'},
-		{position:[-1, 1, 1],type:14,color:'#ff0000'},
-		{position:[ 0, 1, 1],type:14,color:'#ff0000'},
-		{position:[ 1, 1, 1],type:14,color:'#ff0000'},
-		//	jets
-		{position:[ 0, 0,-3],type: 6,color:'#ff0000'},
-		{position:[ 0, 0,-2],type: 9,color:'#ff0000'},
-		{position:[ 0, 0, 3],type: 6,color:'#ff0000'},
-		{position:[ 0, 0, 2],type: 9,color:'#ff0000'},
-		{position:[ 0,-3, 0],type: 6,color:'#ff0000'},
-		{position:[ 0,-2, 0],type: 9,color:'#ff0000'},
-		{position:[ 0, 3, 0],type: 6,color:'#ff0000'},
-		{position:[ 0, 2, 0],type: 9,color:'#ff0000'},
-		{position:[-3, 0, 0],type: 6,color:'#ff0000'},
-		{position:[-2, 0, 0],type: 9,color:'#ff0000'},
-		{position:[ 3, 0, 0],type: 6,color:'#ff0000'},
-		{position:[ 2, 0, 0],type: 9,color:'#ff0000'},
-		]
-		jets=[
-		{name:'up'   ,len:2,dir:[ 0, 1, 0],end:[ 0,-4, 0]},
-		{name:'down' ,len:2,dir:[ 0,-1, 0],end:[ 0, 4, 0]},
-		{name:'left' ,len:2,dir:[ 1, 0, 0],end:[-4, 0, 0]},
-		{name:'right',len:2,dir:[-1, 0, 0],end:[ 4, 0, 0]},
-		{name:'front',len:2,dir:[ 0, 0, 1],end:[ 0, 0,-4]},
-		{name:'back' ,len:2,dir:[ 0, 0,-1],end:[ 0, 0, 4]},
-		]
-		return {units:units,jets:jets}
-	}
-
-	function quadcopter(){
-		var r=0.5/Math.sin(Math.PI*22.5/180)
-		   ,d=r*Math.sin(Math.PI*45/180)
-		units=[
-		//	locator gyroscope
-		{position:[ 0, 0, 0],type:17,color:'#ff0000'},
-		{position:[ 1, 0, 0],type:17,color:'#ff0000'},
-		{position:[-1, 0, 0],type:17,color:'#ff0000'},
-		{position:[ 0, 1, 0],type:17,color:'#ff0000'},
-		{position:[ 0,-1, 0],type:17,color:'#ff0000'},
-		{position:[ 0, 0, 1],type:17,color:'#ff0000'},
-		{position:[ 0, 0,-1],type:17,color:'#ff0000'},
-		//	CPU
-		{position:[-1,-1,-1],type:14,color:'#ff0000'},
-		{position:[ 0,-1,-1],type:14,color:'#ff0000'},
-		{position:[ 1,-1,-1],type:14,color:'#ff0000'},
-		{position:[-1, 0,-1],type:14,color:'#ff0000'},
-		// {position:[ 0, 0,-1],type:14,color:'#ff0000'},
-		{position:[ 1, 0,-1],type:14,color:'#ff0000'},
-		{position:[-1, 1,-1],type:14,color:'#ff0000'},
-		{position:[ 0, 1,-1],type:14,color:'#ff0000'},
-		{position:[ 1, 1,-1],type:14,color:'#ff0000'},
-
-		{position:[-1,-1, 0],type:14,color:'#ff0000'},
-		// {position:[ 0,-1, 0],type:14,color:'#ff0000'},
-		{position:[ 1,-1, 0],type:14,color:'#ff0000'},
-		{position:[-1, 0, 0],type:14,color:'#ff0000'},
-		// {position:[ 0, 0, 0],type:14,color:'#ff0000'},
-		{position:[ 1, 0, 0],type:14,color:'#ff0000'},
-		{position:[-1, 1, 0],type:14,color:'#ff0000'},
-		// {position:[ 0, 1, 0],type:14,color:'#ff0000'},
-		{position:[ 1, 1, 0],type:14,color:'#ff0000'},
-
-		{position:[-1,-1, 1],type:14,color:'#ff0000'},
-		{position:[ 0,-1, 1],type:14,color:'#ff0000'},
-		{position:[ 1,-1, 1],type:14,color:'#ff0000'},
-		{position:[-1, 0, 1],type:14,color:'#ff0000'},
-		// {position:[ 0, 0, 1],type:14,color:'#ff0000'},
-		{position:[ 1, 0, 1],type:14,color:'#ff0000'},
-		{position:[-1, 1, 1],type:14,color:'#ff0000'},
-		{position:[ 0, 1, 1],type:14,color:'#ff0000'},
-		{position:[ 1, 1, 1],type:14,color:'#ff0000'},
-
-		// 4 axis jets
-		{position:[ 0, 0,-2],type:12,color:'#ff0000'},
-		{position:[ 0, 0,-3],type:12,color:'#ff0000'},
-		{position:[ 0, 0,-4],type:12,color:'#ff0000'},
-		{position:[ 0, 1,-4],type: 9,color:'#ff0000'},
-		{position:[ 0, 2,-4],type: 6,color:'#ff0000'},
-		{position:[ 0,-1,-4],type: 9,color:'#ff0000'},
-		{position:[ 0,-2,-4],type: 6,color:'#ff0000'},
-
-		{position:[ 0, 0, 2],type:12,color:'#ff0000'},
-		{position:[ 0, 0, 3],type:12,color:'#ff0000'},
-		{position:[ 0, 0, 4],type:12,color:'#ff0000'},
-		{position:[ 0, 1, 4],type: 9,color:'#ff0000'},
-		{position:[ 0, 2, 4],type: 6,color:'#ff0000'},
-		{position:[ 0,-1, 4],type: 9,color:'#ff0000'},
-		{position:[ 0,-2, 4],type: 6,color:'#ff0000'},		
-
-		{position:[-2, 0, 0],type:12,color:'#ff0000'},
-		{position:[-3, 0, 0],type:12,color:'#ff0000'},
-		{position:[-4, 0, 0],type:12,color:'#ff0000'},
-		{position:[-4, 1, 0],type: 9,color:'#ff0000'},
-		{position:[-4, 2, 0],type: 6,color:'#ff0000'},
-		{position:[-4,-1, 0],type: 9,color:'#ff0000'},
-		{position:[-4,-2, 0],type: 6,color:'#ff0000'},
-
-		{position:[ 2, 0, 0],type:12,color:'#ff0000'},
-		{position:[ 3, 0, 0],type:12,color:'#ff0000'},
-		{position:[ 4, 0, 0],type:12,color:'#ff0000'},
-		{position:[ 4, 1, 0],type: 9,color:'#ff0000'},
-		{position:[ 4, 2, 0],type: 6,color:'#ff0000'},
-		{position:[ 4,-1, 0],type: 9,color:'#ff0000'},
-		{position:[ 4,-2, 0],type: 6,color:'#ff0000'},
-		// 
-		]
-		jets=[
-		{name:'left-up' ,len:2,dir:[ 0,-1, 0],end:[ 4, 3, 0]},
-		{name:'right-up',len:2,dir:[ 0,-1, 0],end:[-4, 3, 0]},
-		{name:'front-up',len:2,dir:[ 0,-1, 0],end:[ 0, 3, 4]},
-		{name:'back-up' ,len:2,dir:[ 0,-1, 0],end:[ 0, 3,-4]},
-		{name:'left-down' ,len:2,dir:[ 0, 1, 0],end:[ 4,-3, 0]},
-		{name:'right-down',len:2,dir:[ 0, 1, 0],end:[-4,-3, 0]},
-		{name:'front-down',len:2,dir:[ 0, 1, 0],end:[ 0,-3, 4]},
-		{name:'back-down' ,len:2,dir:[ 0, 1, 0],end:[ 0,-3,-4]},
-		]
-		return {units:units,jets:jets}
-	}
-
-	function fighter(){
-		var s3d2=Math.sqrt(3)/2
-		   ,s2ds3=Math.sqrt(2)/Math.sqrt(3)
-		   ,s2d2=Math.sqrt(2)/2
-		units=[
-		//	locator gyroscope
-		{position:[ 0, 0, 0],type:17,color:'#ff0000'},
-		{position:[ 1, 0, 0],type:17,color:'#ff0000'},
-		{position:[-1, 0, 0],type:17,color:'#ff0000'},
-		{position:[ 0, 1, 0],type:17,color:'#ff0000'},
-		{position:[ 0,-1, 0],type:17,color:'#ff0000'},
-		{position:[ 0, 0, 1],type:17,color:'#ff0000'},
-		{position:[ 0, 0,-1],type:17,color:'#ff0000'},
-		//	CPU
-		{position:[-1,-1,-1],type:14,color:'#ff0000'},
-		{position:[ 0,-1,-1],type:14,color:'#ff0000'},
-		{position:[ 1,-1,-1],type:14,color:'#ff0000'},
-		{position:[-1, 0,-1],type:14,color:'#ff0000'},
-		// {position:[ 0, 0,-1],type:14,color:'#ff0000'},
-		{position:[ 1, 0,-1],type:14,color:'#ff0000'},
-		{position:[-1, 1,-1],type:14,color:'#ff0000'},
-		{position:[ 0, 1,-1],type:14,color:'#ff0000'},
-		{position:[ 1, 1,-1],type:14,color:'#ff0000'},
-
-		{position:[-1,-1, 0],type:14,color:'#ff0000'},
-		// {position:[ 0,-1, 0],type:14,color:'#ff0000'},
-		{position:[ 1,-1, 0],type:14,color:'#ff0000'},
-		{position:[-1, 0, 0],type:14,color:'#ff0000'},
-		// {position:[ 0, 0, 0],type:14,color:'#ff0000'},
-		{position:[ 1, 0, 0],type:14,color:'#ff0000'},
-		{position:[-1, 1, 0],type:14,color:'#ff0000'},
-		// {position:[ 0, 1, 0],type:14,color:'#ff0000'},
-		{position:[ 1, 1, 0],type:14,color:'#ff0000'},
-
-		{position:[-1,-1, 1],type:14,color:'#ff0000'},
-		{position:[ 0,-1, 1],type:14,color:'#ff0000'},
-		{position:[ 1,-1, 1],type:14,color:'#ff0000'},
-		{position:[-1, 0, 1],type:14,color:'#ff0000'},
-		// {position:[ 0, 0, 1],type:14,color:'#ff0000'},
-		{position:[ 1, 0, 1],type:14,color:'#ff0000'},
-		{position:[-1, 1, 1],type:14,color:'#ff0000'},
-		{position:[ 0, 1, 1],type:14,color:'#ff0000'},
-		{position:[ 1, 1, 1],type:14,color:'#ff0000'},
-		// left wing
-		{position:[ 1+s3d2, .5, 1],type: 9,color:'#ff0000'},
-		{position:[ 1+s3d2,-.5, 1],type: 6,color:'#ff0000'},
-		{position:[ 1+s3d2, .5, 0],type: 6,color:'#ff0000'},
-		{position:[ 1+s3d2,-.5, 0],type: 9,color:'#ff0000'},		
-		{position:[ 1+2*s3d2, 0, 1],type: 6,color:'#ff0000'},
-		{position:[ 1+2*s3d2, 0,-0],type: 9,color:'#ff0000'},
-		{position:[ 2+2*s3d2, 0, 1],type: 9,color:'#ff0000'},
-		{position:[ 2+2*s3d2, 0,-0],type: 6,color:'#ff0000'},
-		{position:[ 2+3*s3d2, 0, 0.5],type: 9,color:'#ff0000'},
-		{position:[ 2+3*s3d2, 0,-0.5],type: 6,color:'#ff0000'},
-		// right wing
-		{position:[-1-s3d2, .5, 1],type: 6,color:'#ff0000'},
-		{position:[-1-s3d2,-.5, 1],type: 9,color:'#ff0000'},
-		{position:[-1-s3d2, .5, 0],type: 9,color:'#ff0000'},
-		{position:[-1-s3d2,-.5, 0],type: 6,color:'#ff0000'},		
-		{position:[-1-2*s3d2, 0, 1],type: 6,color:'#ff0000'},
-		{position:[-1-2*s3d2, 0,-0],type: 9,color:'#ff0000'},
-		{position:[-2-2*s3d2, 0, 1],type: 9,color:'#ff0000'},
-		{position:[-2-2*s3d2, 0,-0],type: 6,color:'#ff0000'},
-		{position:[-2-3*s3d2, 0, 0.5],type: 9,color:'#ff0000'},
-		{position:[-2-3*s3d2, 0,-0.5],type: 6,color:'#ff0000'},
-		// up jets
-		{position:[ 0, 2, 0],type: 9,color:'#ff0000'},
-		{position:[ 0, 2, 1],type: 6,color:'#ff0000'},
-		// {position:[ 0, 2,-2],type: 9,color:'#ff0000'},
-		// down jets
-		{position:[ 0,-2, 0],type: 9,color:'#ff0000'},
-		{position:[ 0,-2, 1],type: 6,color:'#ff0000'},
-		// {position:[ 0,-2,-2],type: 9,color:'#ff0000'},
-		// back jets
-		{position:[ 0, 0, -2],type:9,color:'#ff0000'},
-		{position:[ 0, 0, -3],type:6,color:'#ff0000'},
-		{position:[ 0, s3d2, -2.5],type:9,color:'#ff0000'},
-		{position:[ 0, s3d2, -3.5],type:6,color:'#ff0000'},
-		{position:[ 0,-s3d2, -2.5],type:9,color:'#ff0000'},
-		{position:[ 0,-s3d2, -3.5],type:6,color:'#ff0000'},
-		{position:[ s3d2,0, -2.5],type:9,color:'#ff0000'},
-		{position:[ s3d2,0, -3.5],type:6,color:'#ff0000'},
-		{position:[-s3d2,0, -2.5],type:9,color:'#ff0000'},
-		{position:[-s3d2,0, -3.5],type:6,color:'#ff0000'},
-		// camera
-		{position:[ 1,  0, 2],type:17,color:'#ff0000'},
-		{position:[ 0,  0, 2],type:17,color:'#ff0000'},
-		{position:[-1,  0, 2],type:17,color:'#ff0000'},		
-		{position:[ 0.5, s3d2, 2],type:17,color:'#ff0000'},
-		{position:[-0.5, s3d2, 2],type:17,color:'#ff0000'},
-		{position:[ 0.5,-s3d2, 2],type:17,color:'#ff0000'},
-		{position:[-0.5,-s3d2, 2],type:17,color:'#ff0000'},
-
-		{position:[ 1,  0, 3],type:17,color:'#ff0000'},
-		{position:[ 0,  0, 3],type:10,color:'#ff0000'},
-		{position:[-1,  0, 3],type:17,color:'#ff0000'},		
-		{position:[ 0.5, s3d2, 3],type:10,color:'#ff0000'},
-		{position:[-0.5, s3d2, 3],type:10,color:'#ff0000'},
-		{position:[ 0.5,-s3d2, 3],type:17,color:'#ff0000'},
-		{position:[-0.5,-s3d2, 3],type:17,color:'#ff0000'},
-
-		{position:[ .5,-s3d2/3, 3+s3d2],type:12,color:'#ff0000'},
-		{position:[-.5,-s3d2/3, 3+s3d2],type:12,color:'#ff0000'},
-		{position:[ 0,2*s3d2/3, 3+s3d2],type:12,color:'#ff0000'},
-		
-		// {position:[ 0, 0, 3+s3d2+s2ds3],type:12,color:'#ff0000'},
-		]
-		jets=[
-		{name:'left-up' ,len:2,dir:[ 0, 1, 0],end:[ 1+s3d2,-1.5, 1]},
-		{name:'left-down' ,len:2,dir:[ 0,-1, 0],end:[ 1+s3d2, 1.5, 0]},
-		{name:'left-1' ,len:2,dir:[ 0, 0,-1],end:[ 1+2*s3d2, 0, 2]},
-		// {name:'left-2' ,len:2,dir:[ 0, 0, 1],end:[ 3, 0,-1]},
-		// {name:'left-3' ,len:2,dir:[ 0, 0, 1],end:[ 3+s3d2, 0,-1.5]},
-
-		{name:'right-up' ,len:2,dir:[ 0, 1, 0],end:[-1-s3d2,-1.5, 0]},
-		{name:'right-down' ,len:2,dir:[ 0,-1, 0],end:[-1-s3d2, 1.5, 1]},
-		{name:'right-1' ,len:2,dir:[ 0, 0,-1],end:[-1-2*s3d2, 0, 2]},
-		// {name:'right-2' ,len:2,dir:[ 0, 0, 1],end:[-3, 0,-1]},
-		// {name:'right-3' ,len:2,dir:[ 0, 0, 1],end:[-3-s3d2, 0,-1.5]},
-
-		{name:'up' ,len:2,dir:[ 0, 0,-1],end:[ 0, 2, 2]},
-		{name:'down' ,len:2,dir:[ 0, 0,-1],end:[ 0,-2, 2]},
-
-		{name:'back-0' ,len:2,dir:[ 0, 0, 1],end:[ 0, 0, -4]},
-		{name:'back-1' ,len:2,dir:[ 0, 0, 1],end:[ 0, s3d2, -4.5]},
-		{name:'back-2' ,len:2,dir:[ 0, 0, 1],end:[ 0,-s3d2, -4.5]},
-		{name:'back-3' ,len:2,dir:[ 0, 0, 1],end:[ s3d2,0, -4.5]},
-		{name:'back-4' ,len:2,dir:[ 0, 0, 1],end:[-s3d2,0, -4.5]},
-		]
-		return {units:units,jets:jets}		
+		}
+		switch(event.keyCode){
+		case 27:
+			$("#system").dialog('open');break;
+		}	
 	}
 
 	init();

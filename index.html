@@ -19,18 +19,35 @@
 <!-- <script src="three.min.js"></script> -->
 <body oncontextmenu="return false;" onselectstart="return false;">
 <center>	
-
-<div id='system'><br>
-	<button id='start'>Start Game</button><br>
-    <button id='craft'>Select Craft</button><br>
-    <button id='level'>Select Level</button><br>
-	<button id='edit'>Edit Program</button>
-
-</div>	
+	<div id='menu'><br>
+		<button id='start'>Start Game</button><br>
+	    <button id='craft'>Select Craft</button><br>
+	    <button id='level'>Select Level</button><br>
+		<button id='edit'>Edit Program</button>
+	</div>	
+	
+	<div id='selCraft'>
+		<div id="tabs">
+		<ul>
+		<li><a href="#tabs-1">Kernel</a></li>
+		<li><a href="#tabs-2">Quad</a></li>
+		<li><a href="#tabs-3">Fight</a></li>
+		<li><a href="#tabs-4">upload ...</a></li>
+		</ul>
+		<div id="tabs-1">tabs-1
+			<canvas></canvas>
+		</div>
+		<div id="tabs-2">tabs-2
+		</div>
+		<div id="tabs-3">tabs-3
+		</div>
+		<div id="tabs-4">tabs-3
+		</div>
+		</div>
+	</div>	
 </center>
 <script>
-  // $(function() {
-    $("#system").dialog({
+    $("#menu").dialog({
     	title:'Main Menu',
     	position:{at:"center center"},
     	width:150,height:220,
@@ -42,22 +59,43 @@
 		show:{effect: "clip",duration: 200},
 		hide:{effect: "clip",duration: 200}
     });
-    // $("#start").button() 
-    $("#start").button().click(function(){
-		$("#system").dialog('close')
-		renderer.domElement.requestPointerLock = 
-			renderer.domElement.requestPointerLock ||
-			renderer.domElement.mozRequestPointerLock ||
-			renderer.domElement.webkitRequestPointerLock;
-		renderer.domElement.requestPointerLock()
-    });
-    // $("#exit").button() 
-    $("#craft").button()
-    $("#level").button()
-    $("#edit").button().click(function(){});
-
-
-  // });
+		$("#start").button().click(function(){
+			$("#menu").dialog('close')
+			renderer.domElement.requestPointerLock = 
+				renderer.domElement.requestPointerLock ||
+				renderer.domElement.mozRequestPointerLock ||
+				renderer.domElement.webkitRequestPointerLock;
+			renderer.domElement.requestPointerLock()
+		});
+		$("#craft").button().click(function(){
+			$("#menu").dialog('close')
+			$('#selCraft').dialog('open')
+		});
+		$("#level").button()
+		$("#edit").button().click(function(){});
+    $('#selCraft').dialog({
+    	title:'Select Craft',
+    	position:{at:"center center"},
+    	width:500,height:600,
+    	autoOpen:false,
+    	resizable:false,
+    	draggable:false,
+    	open: function(){
+    		$(".ui-dialog-titlebar-close").hide();
+    	},
+		show:{effect: "clip",duration: 200},
+		hide:{effect: "clip",duration: 200},
+		buttons: {
+        "upload": function() {
+        },
+        'OK': function() {
+			$("#menu").dialog('open')
+			$('#selCraft').dialog('close')
+        }
+      	}
+    })
+    $('#selCraft').dialog('close')
+    	$( "#tabs" ).tabs();
 
 	var CoC={}
 	var camera, scene, renderer;
@@ -128,9 +166,8 @@
     	runway.resetColor(0)
     	// radius=200,thita=0.5,phai=-1.55;
 		
-			$("#system").dialog('open');break;
+			$("#menu").dialog('open');break;
 		}
-		console.log(event.keyCode)
 	}
 
 	function setBackground(){
@@ -340,9 +377,12 @@
 			}
 			for(g=p;g<p+5;g++){
 				for(c=0;c<4;c++){
-					var hue=gates[g].children[c].material.color.getHSL().h
+					var H=gates[g].children[c].material.color.getHSL().h
+					   ,S=gates[g].children[c].material.color.getHSL().s
+					   ,L=gates[g].children[c].material.color.getHSL().l
 					gates[g].visible=true
-					gates[g].children[c].material.color.setHSL(hue,1,0.5-i*0.1)
+					gates[g].children[c].material.color.setHSL(H,S,0.5-i*0.1)
+					console.log(c,L,L*(1-0.2*i))
 				}
 				i++
 			}
@@ -352,7 +392,7 @@
 
 	function setGates(position,euler){
 		var geometry,vertex,material,frame
-		var position,normal,arrow,lineColor=0xff00ff
+		var position,normal,arrow,lineColor=0x888888
 		var origin =new THREE.Vector3(0,0,0) 
 			,xAxis =new THREE.Vector3(7,0,0)
 			,yAxis =new THREE.Vector3(0,7,0)

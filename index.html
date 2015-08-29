@@ -21,63 +21,39 @@
 <center>	
 
 <div id='system'><br>
-	Game:<br>
-	<button id='start'>Start</button>
-	<!-- <button id='reset'>Reset</button> -->
-	<button id='exit'>Exit</button>
-	<br><br>
-	Level:
-	<br><br>
-	Craft:<br>
-    <select name="craft" id="craft">
-      <option>Kernel</option>
-      <option>Quad</option>
-      <option>Fighter</option>
-    </select>
-    <br><br>
-	Control:
-	<button id='edit'>Edit program</button>
+	<button id='start'>Start Game</button><br>
+    <button id='craft'>Select Craft</button><br>
+    <button id='level'>Select Level</button><br>
+	<button id='edit'>Edit Program</button>
 
 </div>	
 </center>
 <script>
   // $(function() {
     $("#system").dialog({
-    	title:'System',
+    	title:'Main Menu',
     	position:{at:"center center"},
-    	// right:0,
-    	width:150,height:350,
+    	width:150,height:220,
     	resizable:false,
     	draggable:false,
     	open: function(){
     		$(".ui-dialog-titlebar-close").hide();
     	},
-		show:{effect: "fold",duration: 200},
-		hide:{effect: "fold",duration: 200}
+		show:{effect: "clip",duration: 200},
+		hide:{effect: "clip",duration: 200}
     });
     // $("#start").button() 
     $("#start").button().click(function(){
-    	// location.reload()
-    	craft.accelera.set(0,0,0)
-    	craft.velocity.set(0,0,0)
-    	craft.position.set(0,20,-100)
-    	craft.rotaAcce.set(0,0,0)
-    	craft.rotaVelo.set(0,0,0)
-    	craft.rotation.set(0,0,0)
-    	presentGate=0
-    	runway.resetColor(0)
-    	// radius=200,thita=0.5,phai=-1.55;
-    	renderer.domElement.requestPointerLock = 
+		$("#system").dialog('close')
+		renderer.domElement.requestPointerLock = 
 			renderer.domElement.requestPointerLock ||
 			renderer.domElement.mozRequestPointerLock ||
 			renderer.domElement.webkitRequestPointerLock;
 		renderer.domElement.requestPointerLock()
-		$("#system").dialog('close')
     });
-    $("#exit").button() 
-    $("#radio").buttonset().click(function(){console.log($("#radio:radio:checked").attr('id'))});
-    $("#craft").selectmenu({width:100});
-
+    // $("#exit").button() 
+    $("#craft").button()
+    $("#level").button()
     $("#edit").button().click(function(){});
 
 
@@ -124,6 +100,8 @@
 		scene.add(background)
 
 		renderer.domElement.addEventListener('mousemove', mousemoveReact);
+		document.addEventListener('keydown',escPress);
+		document.addEventListener('keyup',escPress);
 		// document.addEventListener('keydown', ctrlKernel, false );
 		// document.addEventListener('keyup', ctrlKernel, false );
 		// document.addEventListener('keydown', ctrlQuad, false );
@@ -134,6 +112,25 @@
 
 		setInterval('render()',60)
 		setInterval('timer()',10)
+	}
+
+	function escPress(event){
+		switch(event.keyCode){
+		case 27:
+    	// location.reload()
+    	craft.accelera.set(0,0,0)
+    	craft.velocity.set(0,0,0)
+    	craft.position.set(0,20,-100)
+    	craft.rotaAcce.set(0,0,0)
+    	craft.rotaVelo.set(0,0,0)
+    	craft.rotation.set(0,0,0)
+    	presentGate=0
+    	runway.resetColor(0)
+    	// radius=200,thita=0.5,phai=-1.55;
+		
+			$("#system").dialog('open');break;
+		}
+		console.log(event.keyCode)
 	}
 
 	function setBackground(){
@@ -647,10 +644,6 @@
 		case 'R':
 			craft.switchJets('right-1',trigger);
 			craft.switchJets('back-0',trigger);break;
-		}
-		switch(event.keyCode){
-		case 27:
-			$("#system").dialog('open');break;
 		}	
 	}
 

@@ -66,6 +66,9 @@
 				renderer.domElement.mozRequestPointerLock ||
 				renderer.domElement.webkitRequestPointerLock;
 			renderer.domElement.requestPointerLock()
+			renderer.domElement.addEventListener('mousemove', mousemoveReact);
+			document.addEventListener('keydown', ctrlFight);
+			document.addEventListener('keyup', ctrlFight);			
 		});
 		$("#craft").button().click(function(){
 			$("#menu").dialog('close')
@@ -137,15 +140,15 @@
 		setBackground()
 		scene.add(background)
 
-		renderer.domElement.addEventListener('mousemove', mousemoveReact);
+		// renderer.domElement.addEventListener('mousemove', mousemoveReact);
 		document.addEventListener('keydown',escPress);
 		document.addEventListener('keyup',escPress);
 		// document.addEventListener('keydown', ctrlKernel, false );
 		// document.addEventListener('keyup', ctrlKernel, false );
 		// document.addEventListener('keydown', ctrlQuad, false );
 		// document.addEventListener('keyup', ctrlQuad, false );
-		document.addEventListener('keydown', ctrlFight);
-		document.addEventListener('keyup', ctrlFight);
+		// document.addEventListener('keydown', ctrlFight);
+		// document.addEventListener('keyup', ctrlFight);
 
 
 		setInterval('render()',60)
@@ -164,10 +167,13 @@
     	craft.rotation.set(0,0,0)
     	presentGate=0
     	runway.resetColor(0)
-    	// radius=200,thita=0.5,phai=-1.55;
-		
-			$("#menu").dialog('open');break;
+    	radius=200,thita=0.5,phai=-1.55;
+		renderer.domElement.removeEventListener('mousemove', mousemoveReact);
+		document.removeEventListener('keydown', ctrlFight);
+		document.removeEventListener('keyup', ctrlFight);
+		$("#menu").dialog('open');break;
 		}
+
 	}
 
 	function setBackground(){
@@ -272,6 +278,16 @@
 				.fromArray(model.units[i].position)
 			craft.add(units[i])
 			craft.massCenter.add(units[i].position)
+		}
+
+		craft.massCenter.multiplyScalar(1/craft.mass)
+		console.log(craft.mass,craft.massCenter)		
+
+		for(var i=0;i<model.units.length;i++){
+			console.log(units[i].position)
+			units[i].position.sub(craft.massCenter)
+			console.log(units[i].position)
+
 			craft.inertia.elements[0]+=
 				Math.pow(units[i].position.y,2)+Math.pow(units[i].position.z,2) 
 			craft.inertia.elements[1]-=units[i].position.x*units[i].position.y
@@ -286,11 +302,8 @@
 		craft.inertia.elements[8]=craft.inertia.elements[2]
 		craft.inertia.elements[9]=craft.inertia.elements[6]
 
-		craft.massCenter.multiplyScalar(1/craft.mass)
-		// craft.inertia.multiplyScalar(250)
-		// console.log(craft.inertia)
 		var invIner=new THREE.Matrix4().getInverse(craft.inertia.clone(),true)
-		console.log(craft.mass,craft.massCenter,craft.inertia)
+		// console.log(craft.mass,craft.massCenter,craft.inertia)
 
 
 		var jets=new Array
@@ -299,6 +312,7 @@
 			   ,dir=new THREE.Vector3().fromArray(model.jets[i].dir)
 			   ,end=new THREE.Vector3().fromArray(model.jets[i].end)
 			   ,origin,vector
+			end.sub(craft.massCenter)
 			vector=dir.clone().multiplyScalar(model.jets[i].len*4)
 			origin=end.clone().sub(vector)
 			jets[i]=CoC.Arrow(origin,vector,0xff0000)
@@ -382,7 +396,6 @@
 					   ,L=gates[g].children[c].material.color.getHSL().l
 					gates[g].visible=true
 					gates[g].children[c].material.color.setHSL(H,S,0.5-i*0.1)
-					console.log(c,L,L*(1-0.2*i))
 				}
 				i++
 			}

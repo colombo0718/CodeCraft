@@ -23,7 +23,7 @@
 		<button id='start'>Start Game</button><br>
 	    <button id='craft'>Select Craft</button><br>
 	    <button id='level'>Select Level</button><br>
-		<button id='edit'>Edit Program</button>
+		<button id='engin'>Engineering</button>
 	</div>	
 	
 	<div id='selCraft'>
@@ -61,6 +61,8 @@
     });
 		$("#start").button().click(function(){
 			$("#menu").dialog('close')
+			timer.start()
+
 			renderer.domElement.requestPointerLock = 
 				renderer.domElement.requestPointerLock ||
 				renderer.domElement.mozRequestPointerLock ||
@@ -68,14 +70,16 @@
 			renderer.domElement.requestPointerLock()
 			renderer.domElement.addEventListener('mousemove', mousemoveReact);
 			document.addEventListener('keydown', ctrlFight);
-			document.addEventListener('keyup', ctrlFight);			
+			document.addEventListener('keyup', ctrlFight);	
+			setInterval('render()',60)
+			setInterval('flash()',10)		
 		});
 		$("#craft").button().click(function(){
 			$("#menu").dialog('close')
 			$('#selCraft').dialog('open')
 		});
 		$("#level").button()
-		$("#edit").button().click(function(){});
+		$("#engin").button().click(function(){});
     $('#selCraft').dialog({
     	title:'Select Craft',
     	position:{at:"center center"},
@@ -107,8 +111,10 @@
 	var craft,runway,auxPlane,background;
 	var radius=200,thita=0.5,phai=-1.55;
 	var x0=0,y0=0;
-	var ts=new Date().getTime(),tt
-	var t0=ts,t1,dt
+	// var ts=new Date().getTime(),tt
+	// var t0=ts,t1,dt
+	var timer=new THREE.Clock(),tt,dt
+
 	var s3d2=Math.sqrt(3)/2,s2d2=Math.sqrt(2)/2
 
 	var presentGate=0
@@ -150,9 +156,9 @@
 		// document.addEventListener('keydown', ctrlFight);
 		// document.addEventListener('keyup', ctrlFight);
 
-
-		setInterval('render()',60)
-		setInterval('timer()',10)
+		render()
+		// setInterval('render()',60)
+		// setInterval('flash()',10)
 	}
 
 	function escPress(event){
@@ -199,7 +205,7 @@
 		renderer.render( scene, camera );
 	}
 
-	function timer(){
+	function flash(){
 		var now=new Date()
 		var  XX = new THREE.Vector3( 1, 0, 0 )
 			,YY = new THREE.Vector3( 0, 1, 0 )
@@ -209,11 +215,11 @@
 		   ,scale=new THREE.Vector3()
 		   ,mC=new THREE.Matrix4();		
 		var dv,dx,drv,drx	
-		t1=now.getTime()
-		dt=(t1-t0)*0.001
-		tt=(t1-ts)*0.001
-		t0=t1
-		// dt*=2
+
+		dt=timer.getDelta()
+		console.log(tt)
+		tt=timer.getElapsedTime()
+
 		if(runway.sensor(presentGate)==true){
 			presentGate+=1
 			if(presentGate==runway.children.length){
@@ -222,6 +228,23 @@
 			}
 			runway.resetColor(presentGate)
 		}
+
+			craft.force.set(0,0,0)
+			craft.torque.set(0,0,0)
+			for(var i=0;i<craft.jets.length;i++){
+				if(craft.jets[i].visible==false){continue}
+				craft.force.add(
+					craft.jets[i].force.clone()				   
+				)
+				craft.torque.add(
+					craft.jets[i].torque.clone()
+				)
+			}
+			craft.matrixWorld.decompose(vector3,quaternion,scale)
+			craft.accelera=craft.force.divideScalar(craft.mass)
+			craft.rotaAcce=craft.torque.applyMatrix4(craft.invIner)
+			craft.accelera.applyQuaternion(quaternion)
+			craft.rotaAcce.applyQuaternion(quaternion)
 
 		dv=craft.accelera.clone()
 		dv.multiplyScalar(dt)
@@ -284,9 +307,7 @@
 		console.log(craft.mass,craft.massCenter)		
 
 		for(var i=0;i<model.units.length;i++){
-			console.log(units[i].position)
 			units[i].position.sub(craft.massCenter)
-			console.log(units[i].position)
 
 			craft.inertia.elements[0]+=
 				Math.pow(units[i].position.y,2)+Math.pow(units[i].position.z,2) 
@@ -321,28 +342,31 @@
 			jets[i].torque=end.clone().cross(jets[i].force)
 			jets[i].visible=false
 			craft.add(jets[i])
-		}	
+		}
+		craft.jets=jets	
+		craft.invIner=invIner
+
 
 		craft.switchJets=function(name,onoff){
 			if(craft.getObjectByName(name).visible==onoff)
 			{return}
 			craft.getObjectByName(name).visible=onoff
-			craft.force.set(0,0,0)
-			craft.torque.set(0,0,0)
-			for(var i=0;i<model.jets.length;i++){
-				if(jets[i].visible==false){continue}
-				craft.force.add(
-					jets[i].force.clone()				   
-				)
-				craft.torque.add(
-					jets[i].torque.clone()
-				)
-			}
-			craft.matrixWorld.decompose(vector3,quaternion,scale)
-			craft.accelera=craft.force.divideScalar(craft.mass)
-			craft.rotaAcce=craft.torque.applyMatrix4(invIner)
-			craft.accelera.applyQuaternion(quaternion)
-			craft.rotaAcce.applyQuaternion(quaternion)
+			// craft.force.set(0,0,0)
+			// craft.torque.set(0,0,0)
+			// for(var i=0;i<model.jets.length;i++){
+			// 	if(jets[i].visible==false){continue}
+			// 	craft.force.add(
+			// 		jets[i].force.clone()				   
+			// 	)
+			// 	craft.torque.add(
+			// 		jets[i].torque.clone()
+			// 	)
+			// }
+			// craft.matrixWorld.decompose(vector3,quaternion,scale)
+			// craft.accelera=craft.force.divideScalar(craft.mass)
+			// craft.rotaAcce=craft.torque.applyMatrix4(invIner)
+			// craft.accelera.applyQuaternion(quaternion)
+			// craft.rotaAcce.applyQuaternion(quaternion)
 		}
 	}
 

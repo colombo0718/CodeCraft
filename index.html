@@ -45,6 +45,8 @@
 		</div>
 		</div>
 	</div>	
+	<div id='state'>
+	</div>
 </center>
 <script>
     $("#menu").dialog({
@@ -102,7 +104,17 @@
       	}
     })
     $('#selCraft').dialog('close')
-    	$( "#tabs" ).tabs();
+    $('#tabs').tabs();
+    $('#state').dialog({
+    	title:'State',
+    	position:{at:"left top"},
+    	width:300,height:180,
+    	resizable:false,
+    	draggable:false,
+    	open: function(){
+    		$(".ui-dialog-titlebar-close").hide();
+    	},
+    })
 
 	var CoC={}
 	var camera, scene, renderer;
@@ -182,6 +194,8 @@
 
 	}
 
+
+
 	function setBackground(){
 		background=new THREE.Object3D
 		var geometry = new THREE.Geometry();
@@ -196,6 +210,22 @@
 		background.add(stars);
 	}
 
+	THREE.Vector3.prototype.format=function(){
+		return [
+			Math.round(this.x*100)/100,
+			Math.round(this.y*100)/100,
+			Math.round(this.z*100)/100
+		]
+	}	
+	THREE.Euler.prototype.format=function(){
+		return [
+			Math.round(this.x*100)/100,
+			Math.round(this.y*100)/100,
+			Math.round(this.z*100)/100,
+			this.order
+		]
+	}	
+
 	function render(){
 		camera.position.x=craft.position.x+radius*Math.cos(phai)*Math.cos(thita)
 		camera.position.z=craft.position.z+radius*Math.sin(phai)*Math.cos(thita)
@@ -203,6 +233,14 @@
 		camera.lookAt( craft.position );
 		background.position.copy(camera.position)
 		renderer.render( scene, camera );
+		$('#state').html('<br>'+
+			'accelera : '+craft.accelera.format()+'<br>'+
+			'velocity : '+craft.velocity.format()+'<br>'+
+			'position : '+craft.position.format()+'<br>'+
+			'rotaAcce : '+craft.rotaAcce.format()+'<br>'+
+			'rotaVelo : '+craft.rotaVelo.format()+'<br>'+
+			'rotation : '+craft.rotation.format()
+			)
 	}
 
 	function flash(){
@@ -217,7 +255,7 @@
 		var dv,dx,drv,drx	
 
 		dt=timer.getDelta()
-		console.log(tt)
+		// console.log(tt)
 		tt=timer.getElapsedTime()
 
 		if(runway.sensor(presentGate)==true){
@@ -241,8 +279,10 @@
 				)
 			}
 			craft.matrixWorld.decompose(vector3,quaternion,scale)
-			craft.accelera=craft.force.divideScalar(craft.mass)
-			craft.rotaAcce=craft.torque.applyMatrix4(craft.invIner)
+			craft.accelera=craft.force.clone().divideScalar(craft.mass)
+			craft.rotaAcce=craft.torque.clone().applyMatrix4(craft.invIner) // !! not correct
+			// craft.rotaAcce=craft.invIner.clone().applyToVector3Array(craft.torque)
+			// console.log(craft.torque.format(),craft.rotaAcce.format())
 			craft.accelera.applyQuaternion(quaternion)
 			craft.rotaAcce.applyQuaternion(quaternion)
 
@@ -258,11 +298,14 @@
 		craft.rotaVelo.add(drv)
 		drx=craft.rotaVelo.clone()
 		drx.multiplyScalar(dt)
+
 		// console.log(drx)
-		mC.getInverse(craft.matrixWorld)
-		mC.clone().decompose(vector3,quaternion,scale)
-		drx.applyQuaternion(quaternion)
+		// mC.getInverse(craft.matrixWorld)
+		// mC.clone().decompose(vector3,quaternion,scale)
+		// drx.applyQuaternion(quaternion)
 		craft.rotateOnAxis(drx.clone().normalize(),drx.length())
+
+		// console.log(craft.velocity.toArray())
 
 	}
 
@@ -324,7 +367,7 @@
 		craft.inertia.elements[9]=craft.inertia.elements[6]
 
 		var invIner=new THREE.Matrix4().getInverse(craft.inertia.clone(),true)
-		// console.log(craft.mass,craft.massCenter,craft.inertia)
+		console.log(craft.mass,invIner)
 
 
 		var jets=new Array
@@ -695,10 +738,12 @@
 		switch(key){
 		case 'A':
 			craft.switchJets('left-down',trigger);
-			craft.switchJets('right-up',trigger);break;
+			craft.switchJets('right-up',trigger);
+			break;
 		case 'F':
 			craft.switchJets('left-up',trigger);
-			craft.switchJets('right-down',trigger);break;
+			craft.switchJets('right-down',trigger)
+			;break;
 		case 'E':
 			craft.switchJets('back-1',trigger);
 			craft.switchJets('back-2',trigger);

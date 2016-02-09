@@ -225,8 +225,8 @@
 		{position:[ 0, 1+s3d2,-0.5],type: 6,color:'#ff0000'},
 		// {position:[ 0, 2,-2],type: 9,color:'#ff0000'},
 		// down jets
-		{position:[ 0,-1-s3d2, 0.5],type: 9,color:'#ff0000'},
-		{position:[ 0,-1-s3d2, 1.5],type: 6,color:'#ff0000'},
+		{position:[ 0,-1-s3d2,-1.5],type: 9,color:'#ff0000'},
+		{position:[ 0,-1-s3d2,-0.5],type: 6,color:'#ff0000'},
 		// {position:[ 0,-2,-2],type: 9,color:'#ff0000'},
 		// back jets
 		{position:[ 0, 0, -2],type:9,color:'#ff0000'},
@@ -259,14 +259,14 @@
 		{position:[ 1,  0, 4],type:17,color:'#ff0000'},
 		{position:[ 0,  0, 4],type:10,color:'#ff0000'},
 		{position:[-1,  0, 4],type:17,color:'#ff0000'},		
-		// {position:[ 0.5, s3d2, 4],type:10,color:'#ff0000'},
-		// {position:[-0.5, s3d2, 4],type:10,color:'#ff0000'},
+		{position:[ 0.5, s3d2, 4],type:10,color:'#ff0000'},
+		{position:[-0.5, s3d2, 4],type:10,color:'#ff0000'},
 		{position:[ 0.5,-s3d2, 4],type:17,color:'#ff0000'},
 		{position:[-0.5,-s3d2, 4],type:17,color:'#ff0000'},
 
 		{position:[ .5,-s3d2/3, 4+s3d2],type:12,color:'#ff0000'},
 		{position:[-.5,-s3d2/3, 4+s3d2],type:12,color:'#ff0000'},
-		// {position:[ 0,2*s3d2/3, 3+s3d2],type:12,color:'#ff0000'},
+		{position:[ 0,2*s3d2/3, 4+s3d2],type:12,color:'#ff0000'},
 		
 		// {position:[ 0, 0, 3+s3d2+s2ds3],type:12,color:'#ff0000'},
 		]
@@ -284,7 +284,7 @@
 		// {name:'right-3' ,len:2,dir:[ 0, 0, 1],end:[-3-s3d2, 0,-1.5]},
 
 		{name:'up' ,len:2,dir:[ 0, 0,-1],end:[ 0, 1+s3d2, 0.5]},
-		{name:'down' ,len:2,dir:[ 0, 0,-1],end:[ 0,-1-s3d2, 2.5]},
+		{name:'down' ,len:2,dir:[ 0, 0,-1],end:[ 0,-1-s3d2, 0.5]},
 
 		{name:'back-0' ,len:2,dir:[ 0, 0, 1],end:[ 0, 0, -4]},
 		{name:'back-1' ,len:2,dir:[ 0, 0, 1],end:[ 0, s3d2, -4.5]},

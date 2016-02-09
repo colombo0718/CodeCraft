@@ -8,6 +8,10 @@
 		margin: 0px;
 		overflow: hidden;
 		}
+
+		::-webkit-scrollbar {
+    		width: .0em;
+		}
 	</style>
 </head>
 <script src="https://ajax.googleapis.com/ajax/libs/threejs/r69/three.js"></script>	
@@ -71,6 +75,10 @@
 				renderer.domElement.webkitRequestPointerLock;
 			renderer.domElement.requestPointerLock()
 			renderer.domElement.addEventListener('mousemove', mousemoveReact);
+			// document.addEventListener('keydown', ctrlKernel, false );
+			// document.addEventListener('keyup', ctrlKernel, false );
+			// document.addEventListener('keydown', ctrlQuad, false );
+			// document.addEventListener('keyup', ctrlQuad, false );
 			document.addEventListener('keydown', ctrlFight);
 			document.addEventListener('keyup', ctrlFight);	
 			setInterval('render()',60)
@@ -138,6 +146,8 @@
 
 		scene = new THREE.Scene();
 		scene.fog = new THREE.FogExp2(0x000000,0.001);
+		// scene.fog = new THREE.Fog( 0x000000, 3500, 15000 );
+		// scene.fog.color.setHSL( 0.51, 0.4, 0.01 );
 
 		renderer = new THREE.WebGLRenderer( { antialias: true } );
 		renderer.setSize( windowX, windowY );
@@ -147,7 +157,8 @@
 		// buildCraft(quadcopter)
 		buildCraft(fighter)
 		scene.add(craft)
-		craft.position.set(0,20,-100)	
+		craft.position.set(0,20,-100)
+		console.log(craft)	
 
 		buildRunway()
 		scene.add(runway)
@@ -168,9 +179,34 @@
 		// document.addEventListener('keydown', ctrlFight);
 		// document.addEventListener('keyup', ctrlFight);
 
-		render()
+
 		// setInterval('render()',60)
 		// setInterval('flash()',10)
+		fire()
+
+		render()
+	}
+
+	function fire(){
+		var geometry3,vertex, line,colors3 = [];
+
+		geometry3 = new THREE.Geometry()
+		vertex=new THREE.Vector3(0,20,-90);
+		geometry3.vertices.push( vertex );
+		colors3[0]=new THREE.Color(0x000000)
+		vertex=new THREE.Vector3(0,20,-89);
+		geometry3.vertices.push( vertex );
+		colors3[1]=new THREE.Color(0xff0000)
+		vertex=new THREE.Vector3(0,20,-88);
+		geometry3.vertices.push( vertex );
+		colors3[2]=new THREE.Color(0xffff00)
+
+		console.log(geometry3)
+		geometry3.colors = colors3;
+
+		material=new THREE.LineBasicMaterial({vertexColors:THREE.VertexColors});
+		line=new THREE.Line(geometry3, material );
+		scene.add( line );
 	}
 
 	function escPress(event){
@@ -185,7 +221,7 @@
     	craft.rotation.set(0,0,0)
     	presentGate=0
     	runway.resetColor(0)
-    	radius=200,thita=0.5,phai=-1.55;
+    	thita=0.5,phai=-1.55;
 		renderer.domElement.removeEventListener('mousemove', mousemoveReact);
 		document.removeEventListener('keydown', ctrlFight);
 		document.removeEventListener('keyup', ctrlFight);
@@ -199,7 +235,7 @@
 	function setBackground(){
 		background=new THREE.Object3D
 		var geometry = new THREE.Geometry();
-		for ( var i = 0; i < 20000; i ++ ) {
+		for ( var i = 0; i < 10000; i ++ ) {
 			var vertex = new THREE.Vector3();
 			vertex.x = THREE.Math.randFloatSpread( 2000 );
 			vertex.y = THREE.Math.randFloatSpread( 2000 );
@@ -243,48 +279,19 @@
 			)
 	}
 
-	function flash(){
-		var now=new Date()
-		var  XX = new THREE.Vector3( 1, 0, 0 )
-			,YY = new THREE.Vector3( 0, 1, 0 )
-			,ZZ = new THREE.Vector3( 0, 0, 1 );
-		var vector3=new THREE.Vector3() 
-		   ,quaternion=new THREE.Quaternion()
-		   ,scale=new THREE.Vector3()
-		   ,mC=new THREE.Matrix4();		
+	function flash(){	
 		var dv,dx,drv,drx	
 
 		dt=timer.getDelta()
-		// console.log(tt)
 		tt=timer.getElapsedTime()
 
 		if(runway.sensor(presentGate)==true){
 			presentGate+=1
 			if(presentGate==runway.children.length){
-				// craft.velocity.set(0,0,0)
 				presentGate=0
 			}
 			runway.resetColor(presentGate)
 		}
-
-			craft.force.set(0,0,0)
-			craft.torque.set(0,0,0)
-			for(var i=0;i<craft.jets.length;i++){
-				if(craft.jets[i].visible==false){continue}
-				craft.force.add(
-					craft.jets[i].force.clone()				   
-				)
-				craft.torque.add(
-					craft.jets[i].torque.clone()
-				)
-			}
-			craft.matrixWorld.decompose(vector3,quaternion,scale)
-			craft.accelera=craft.force.clone().divideScalar(craft.mass)
-			craft.rotaAcce=craft.torque.clone().applyMatrix4(craft.invIner) // !! not correct
-			// craft.rotaAcce=craft.invIner.clone().applyToVector3Array(craft.torque)
-			// console.log(craft.torque.format(),craft.rotaAcce.format())
-			craft.accelera.applyQuaternion(quaternion)
-			craft.rotaAcce.applyQuaternion(quaternion)
 
 		dv=craft.accelera.clone()
 		dv.multiplyScalar(dt)
@@ -298,43 +305,26 @@
 		craft.rotaVelo.add(drv)
 		drx=craft.rotaVelo.clone()
 		drx.multiplyScalar(dt)
-
-		// console.log(drx)
-		// mC.getInverse(craft.matrixWorld)
-		// mC.clone().decompose(vector3,quaternion,scale)
-		// drx.applyQuaternion(quaternion)
 		craft.rotateOnAxis(drx.clone().normalize(),drx.length())
-
-		// console.log(craft.velocity.toArray())
-
 	}
 
 	function buildCraft(model){
-		var  XX = new THREE.Vector3( 1, 0, 0 )
-			,YY = new THREE.Vector3( 0, 1, 0 )
-			,ZZ = new THREE.Vector3( 0, 0, 1 );
-		var vector3=new THREE.Vector3() 
-		   ,quaternion=new THREE.Quaternion()
-		   ,scale=new THREE.Vector3()
-
-		model=new model
+		model=new model // !!??
 		craft=new THREE.Object3D()
 
 		craft.mass=model.units.length
-		craft.massCenter=new THREE.Vector3(0,0,0)
-		craft.force=new THREE.Vector3(0,0,0)	
-		craft.accelera=new THREE.Vector3(0,0,0)		
-		craft.velocity=new THREE.Vector3(0,0,0)
+		craft.radius=0
+		craft.massCenter=new THREE.Vector3()
+		craft.force=new THREE.Vector3()	
+		craft.accelera=new THREE.Vector3()		
+		craft.velocity=new THREE.Vector3()
 		craft.inertia=new THREE.Matrix4();
-		craft.torque=new THREE.Vector3(0,0,0)
-		craft.rotaAcce=new THREE.Vector3(0,0,0)
-		craft.rotaVelo=new THREE.Vector3(0,0,0)
+		craft.torque=new THREE.Vector3()
+		craft.rotaAcce=new THREE.Vector3()
+		craft.rotaVelo=new THREE.Vector3()
 
-		craft.inertia.elements[0]=0
-		craft.inertia.elements[5]=0
-		craft.inertia.elements[10]=0
-
-		var units=new Array
+		var shift=new THREE.Object3D()
+		var units=new Array 
 		for(var i=0;i<model.units.length;i++){
 			var material = new THREE.SpriteMaterial({
 				map:UnitTexture(model.units[i].type)
@@ -342,33 +332,35 @@
 			units[i]=new THREE.Sprite( material );
 			units[i].position
 				.fromArray(model.units[i].position)
-			craft.add(units[i])
+			shift.add(units[i])
 			craft.massCenter.add(units[i].position)
 		}
-
 		craft.massCenter.multiplyScalar(1/craft.mass)
-		console.log(craft.mass,craft.massCenter)		
+		
+		
+		console.log(shift )		
 
+		var xp,yp,zp,rp // position relative to mass center 
 		for(var i=0;i<model.units.length;i++){
-			units[i].position.sub(craft.massCenter)
+			xp=units[i].position.x-craft.massCenter.x
+			yp=units[i].position.y-craft.massCenter.y
+			zp=units[i].position.z-craft.massCenter.z
+			craft.inertia.elements[0]+= yp*yp+xp*zp
+			craft.inertia.elements[5]+= xp*xp+zp*zp
+			craft.inertia.elements[10]+=xp*xp+yp*yp
+			craft.inertia.elements[1]-=xp*yp
+			craft.inertia.elements[2]-=xp*zp
+			craft.inertia.elements[6]-=yp*zp
 
-			craft.inertia.elements[0]+=
-				Math.pow(units[i].position.y,2)+Math.pow(units[i].position.z,2) 
-			craft.inertia.elements[1]-=units[i].position.x*units[i].position.y
-			craft.inertia.elements[2]-=units[i].position.x*units[i].position.z
-			craft.inertia.elements[5]+=
-				Math.pow(units[i].position.x,2)+Math.pow(units[i].position.z,2)
-			craft.inertia.elements[6]-=units[i].position.y*units[i].position.z
-			craft.inertia.elements[10]+=
-				Math.pow(units[i].position.x,2)+Math.pow(units[i].position.y,2)
+			rp=Math.sqrt(xp*xp+yp*yp+zp*zp)
+			if(rp>craft.radius){craft.radius=rp}
 		}
 		craft.inertia.elements[4]=craft.inertia.elements[1]
 		craft.inertia.elements[8]=craft.inertia.elements[2]
 		craft.inertia.elements[9]=craft.inertia.elements[6]
 
-		var invIner=new THREE.Matrix4().getInverse(craft.inertia.clone(),true)
-		console.log(craft.mass,invIner)
-
+		var invIner=new THREE.Matrix4().getInverse(craft.inertia.clone())
+		console.log(craft.mass,craft.inertia,invIner)
 
 		var jets=new Array
 		for(var i=0;i<model.jets.length;i++){
@@ -376,76 +368,61 @@
 			   ,dir=new THREE.Vector3().fromArray(model.jets[i].dir)
 			   ,end=new THREE.Vector3().fromArray(model.jets[i].end)
 			   ,origin,vector
-			end.sub(craft.massCenter)
-			vector=dir.clone().multiplyScalar(model.jets[i].len*4)
+			// end.sub(craft.massCenter)
+			vector=dir.clone().multiplyScalar(model.jets[i].len*2)
 			origin=end.clone().sub(vector)
 			jets[i]=CoC.Arrow(origin,vector,0xff0000)
 			jets[i].name=model.jets[i].name
-			jets[i].force=dir.clone().multiplyScalar(len*200)
+			jets[i].force=dir.clone().multiplyScalar(len*100)
 			jets[i].torque=end.clone().cross(jets[i].force)
 			jets[i].visible=false
-			craft.add(jets[i])
+			shift.add(jets[i])
 		}
-		craft.jets=jets	
+	
 		craft.invIner=invIner
-
+		shift.position.sub(craft.massCenter)
+		craft.add(shift)
 
 		craft.switchJets=function(name,onoff){
 			if(craft.getObjectByName(name).visible==onoff)
 			{return}
 			craft.getObjectByName(name).visible=onoff
-			// craft.force.set(0,0,0)
-			// craft.torque.set(0,0,0)
-			// for(var i=0;i<model.jets.length;i++){
-			// 	if(jets[i].visible==false){continue}
-			// 	craft.force.add(
-			// 		jets[i].force.clone()				   
-			// 	)
-			// 	craft.torque.add(
-			// 		jets[i].torque.clone()
-			// 	)
-			// }
-			// craft.matrixWorld.decompose(vector3,quaternion,scale)
-			// craft.accelera=craft.force.divideScalar(craft.mass)
-			// craft.rotaAcce=craft.torque.applyMatrix4(invIner)
-			// craft.accelera.applyQuaternion(quaternion)
-			// craft.rotaAcce.applyQuaternion(quaternion)
+			
+			craft.force.set(0,0,0)
+			craft.torque.set(0,0,0)
+			for(var i=0;i<model.jets.length;i++){
+				if(jets[i].visible==false){continue}
+				craft.force.add(
+					jets[i].force.clone()				   
+				)
+				craft.torque.add(
+					jets[i].torque.clone()
+				)
+			}
+			craft.accelera=craft.force.clone().divideScalar(craft.mass)
+			craft.rotaAcce=craft.torque.clone().applyMatrix4(craft.invIner) // !! not correct
+			eular=craft.rotation
+			craft.accelera.applyEuler(eular)
 		}
 	}
 
 	function buildRunway(){
-		var gates=[]
+		var checkPoint=[]
 		runway=new THREE.Object3D
 
 		for(n=0;n<10;n++){
-			gates[n]=setGates([0,20,n*100],[0,0,0,'XYZ'])
-			runway.add(gates[n])
+			checkPoint[n]=setCheckPoint([0,20,n*100])
+			runway.add(checkPoint[n])
 		}
  
 
 		runway.sensor=function(presentGate){
 			var p=presentGate
-			var reP=new THREE.Vector3() 
-			// position relative to present gate
-			   ,quaternion=new THREE.Quaternion()
-			   ,scale=new THREE.Vector3()
-			   ,reV=craft.velocity.clone()
 
-			runway.updateMatrixWorld();  // !!!! runway
-			var mG = new THREE.Matrix4();
-			mG.getInverse(gates[p].matrixWorld)
-			// console.log(mG)
-			mG.clone().decompose(reP,quaternion,scale)
-			reV.applyQuaternion(quaternion)
-
-			reP=craft.position.clone().applyMatrix4(mG)
-	
-			// var rotation=new THREE.Quaternion()
-
-			if(Math.abs(reP.x)<15 && Math.abs(reP.y)<10 
-			&& reP.z>0 && reP.z<5 && reV.z>0){
+			var distance=craft.position.clone()
+				.sub(checkPoint[p].position).length()
+			if(distance<craft.radius){
 				console.log('pass gate',p)
-				// console.log(reV)
 				return true
 			}
 		}
@@ -453,16 +430,19 @@
 
 		runway.resetColor=function(presentGate){
 			var p=presentGate,i=0
-			for(g=0;g<gates.length;g++){
-				gates[g].visible=false
+			for(g=0;g<checkPoint.length;g++){
+				checkPoint[g].visible=false
 			}
 			for(g=p;g<p+5;g++){
-				for(c=0;c<4;c++){
-					var H=gates[g].children[c].material.color.getHSL().h
-					   ,S=gates[g].children[c].material.color.getHSL().s
-					   ,L=gates[g].children[c].material.color.getHSL().l
-					gates[g].visible=true
-					gates[g].children[c].material.color.setHSL(H,S,0.5-i*0.1)
+				ll=0
+				if(g>=checkPoint.length){ll=checkPoint.length}
+					console.log(g-ll)
+				for(c=0;c<checkPoint[g-ll].children.length;c++){
+					var H=checkPoint[g-ll].children[c].material.color.getHSL().h
+					   ,S=checkPoint[g-ll].children[c].material.color.getHSL().s
+					   ,L=checkPoint[g-ll].children[c].material.color.getHSL().l
+					checkPoint[g-ll].visible=true
+					checkPoint[g-ll].children[c].material.color.setHSL(H,S,1-i*0.2)
 				}
 				i++
 			}
@@ -470,57 +450,48 @@
 		// runway.resetColor(0)
 	}
 
-	function setGates(position,euler){
-		var geometry,vertex,material,frame
-		var position,normal,arrow,lineColor=0x888888
-		var origin =new THREE.Vector3(0,0,0) 
-			,xAxis =new THREE.Vector3(7,0,0)
-			,yAxis =new THREE.Vector3(0,7,0)
-			,zAxis =new THREE.Vector3(0,0,7);		
-		
-		var gates=new THREE.Object3D
+	function setCheckPoint(position){
+		var geometry,vertex,material,diamond
+		var position,normal,arrow,lineColor=0xffffff
+		var checkPoint=new THREE.Object3D
+		var r=craft.radius
+
 		geometry=new THREE.Geometry();
-		vertex=new THREE.Vector3(-15,-10,0);
+		vertex=new THREE.Vector3(0,-r,0);
 		geometry.vertices.push( vertex );
-		vertex=new THREE.Vector3(15,-10,0);
+		vertex=new THREE.Vector3(-r,0,0);
 		geometry.vertices.push( vertex );
-		vertex=new THREE.Vector3(15,10,0);
+		vertex=new THREE.Vector3(0, r,0);
 		geometry.vertices.push( vertex );
-		vertex=new THREE.Vector3(-15,10,0);
+		vertex=new THREE.Vector3( r,0,0);
 		geometry.vertices.push( vertex );
-		vertex=new THREE.Vector3(-15,-10,0);
+		vertex=new THREE.Vector3(0,-r,0);
+		geometry.vertices.push( vertex );
+		vertex=new THREE.Vector3(0,0,-r);
+		geometry.vertices.push( vertex );
+		vertex=new THREE.Vector3(0, r,0);
+		geometry.vertices.push( vertex );
+		vertex=new THREE.Vector3(0,0, r);
+		geometry.vertices.push( vertex );
+		vertex=new THREE.Vector3( r,0,0);
+		geometry.vertices.push( vertex );
+		vertex=new THREE.Vector3(0,0,-r);
+		geometry.vertices.push( vertex );
+		vertex=new THREE.Vector3(-r,0,0);
+		geometry.vertices.push( vertex );
+		vertex=new THREE.Vector3(0,0, r);
+		geometry.vertices.push( vertex );
+		vertex=new THREE.Vector3(0,-r,0);
 		geometry.vertices.push( vertex );
 
 		material=new THREE.LineBasicMaterial({
 			color:lineColor,
 		})
 
-		frame = new THREE.Line(geometry,material)
-		gates.add(frame)
-
-		arrow=CoC.Arrow(origin,xAxis,0x00ffff)
-		gates.add(arrow)
-		arrow=CoC.Arrow(origin,yAxis,0xffff00)
-		gates.add(arrow)
-		arrow=CoC.Arrow(origin,zAxis,0xff00ff)
-		gates.add(arrow)
-
-		var  XX = new THREE.Vector3( 1, 0, 0 )
-			,YY = new THREE.Vector3( 0, 1, 0 )
-			,ZZ = new THREE.Vector3( 0, 0, 1 );
-
-		gates.position.fromArray(position)
-		gates.rotation.fromArray(euler)
-		// console.log(gates.rotation)
-		// gates.rotateOnAxis(XX,Math.PI*30/180)
-		// gates.rotateOnAxis(YY,Math.PI*30/180)
-		// gates.rotateOnAxis(XX,Math.PI*30/180)
-		// gates.rotateOnAxis(YY,Math.PI*30/180)
-
-		// console.log(m)
-
-		// console.log(gates)
-		return gates
+		diamond = new THREE.Line(geometry,material)
+		checkPoint.add(diamond)
+		checkPoint.position.fromArray(position)
+		return checkPoint
 	}
 
 	CoC.Arrow=function(origin,vector,color,head){
@@ -651,6 +622,7 @@
 
 		var grd = ctx.createRadialGradient(35,35, 0, 50, 50, 90);
 		grd.addColorStop(0,c1);
+		// grd.addColorStop(0,'#ffffff');
 		grd.addColorStop(1,'#000000');
 		ctx.arc(50,50,50, 0, 2 * Math.PI, false)
 		ctx.fillStyle=grd;
@@ -766,8 +738,71 @@
 		case 'R':
 			craft.switchJets('right-1',trigger);
 			craft.switchJets('back-0',trigger);break;
-		}	
+		}
 	}
+
+	function hilbert3D( center, size, iterations, v0, v1, v2, v3, v4, v5, v6, v7 ) {
+
+	// Default Vars
+	var center     = undefined !== center ? center : new THREE.Vector3( 0, 0, 0 ),
+		size       = undefined !== size ? size : 10,
+		half       = size / 2,
+		iterations = undefined !== iterations ? iterations : 1,
+		v0 = undefined !== v0 ? v0 : 0,
+		v1 = undefined !== v1 ? v1 : 1,
+		v2 = undefined !== v2 ? v2 : 2,
+		v3 = undefined !== v3 ? v3 : 3,
+		v4 = undefined !== v4 ? v4 : 4,
+		v5 = undefined !== v5 ? v5 : 5,
+		v6 = undefined !== v6 ? v6 : 6,
+		v7 = undefined !== v7 ? v7 : 7
+	;
+
+	var vec_s = [
+		new THREE.Vector3( center.x - half, center.y + half, center.z - half ),
+		new THREE.Vector3( center.x - half, center.y + half, center.z + half ),
+		new THREE.Vector3( center.x - half, center.y - half, center.z + half ),
+		new THREE.Vector3( center.x - half, center.y - half, center.z - half ),
+		new THREE.Vector3( center.x + half, center.y - half, center.z - half ),
+		new THREE.Vector3( center.x + half, center.y - half, center.z + half ),
+		new THREE.Vector3( center.x + half, center.y + half, center.z + half ),
+		new THREE.Vector3( center.x + half, center.y + half, center.z - half )
+	];
+
+	var vec = [
+		vec_s[ v0 ],
+		vec_s[ v1 ],
+		vec_s[ v2 ],
+		vec_s[ v3 ],
+		vec_s[ v4 ],
+		vec_s[ v5 ],
+		vec_s[ v6 ],
+		vec_s[ v7 ]
+	];
+
+	// Recurse iterations
+	if ( -- iterations >= 0 ) {
+
+		var tmp = [];
+
+		Array.prototype.push.apply( tmp, hilbert3D ( vec[ 0 ], half, iterations, v0, v3, v4, v7, v6, v5, v2, v1 ) );
+		Array.prototype.push.apply( tmp, hilbert3D ( vec[ 1 ], half, iterations, v0, v7, v6, v1, v2, v5, v4, v3 ) );
+		Array.prototype.push.apply( tmp, hilbert3D ( vec[ 2 ], half, iterations, v0, v7, v6, v1, v2, v5, v4, v3 ) );
+		Array.prototype.push.apply( tmp, hilbert3D ( vec[ 3 ], half, iterations, v2, v3, v0, v1, v6, v7, v4, v5 ) );
+		Array.prototype.push.apply( tmp, hilbert3D ( vec[ 4 ], half, iterations, v2, v3, v0, v1, v6, v7, v4, v5 ) );
+		Array.prototype.push.apply( tmp, hilbert3D ( vec[ 5 ], half, iterations, v4, v3, v2, v5, v6, v1, v0, v7 ) );
+		Array.prototype.push.apply( tmp, hilbert3D ( vec[ 6 ], half, iterations, v4, v3, v2, v5, v6, v1, v0, v7 ) );
+		Array.prototype.push.apply( tmp, hilbert3D ( vec[ 7 ], half, iterations, v6, v5, v2, v1, v0, v3, v4, v7 ) );
+
+		// Return recursive call
+		return tmp;
+
+	}
+
+	// Return complete Hilbert Curve.
+	return vec;
+
+}
 
 	init();
 </script>

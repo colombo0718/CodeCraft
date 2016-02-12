@@ -31,23 +31,10 @@
 	</div>	
 	
 	<div id='selCraft'>
-		<div id="tabs">
-		<ul>
-		<li><a href="#tabs-1">Kernel</a></li>
-		<li><a href="#tabs-2">Quad</a></li>
-		<li><a href="#tabs-3">Fight</a></li>
-		<li><a href="#tabs-4">upload ...</a></li>
-		</ul>
-		<div id="tabs-1">tabs-1
-			<canvas></canvas>
-		</div>
-		<div id="tabs-2">tabs-2
-		</div>
-		<div id="tabs-3">tabs-3
-		</div>
-		<div id="tabs-4">tabs-3
-		</div>
-		</div>
+		<button id='kernel'>Model-001 Kernel</button><br>
+	    <button id='quad'>Model-002 Quad</button><br>
+	    <button id='fighter'>Model-003 Fighter</button><br>
+		<button id='upload'>upload ...</button>
 	</div>	
 	<div id='state'>
 	</div>
@@ -65,8 +52,10 @@
 		show:{effect: "clip",duration: 200},
 		hide:{effect: "clip",duration: 200}
     });
+
 		$("#start").button().click(function(){
 			$("#menu").dialog('close')
+			$("#state").dialog('open')
 			timer.start()
 
 			renderer.domElement.requestPointerLock = 
@@ -77,23 +66,26 @@
 			renderer.domElement.addEventListener('mousemove', mousemoveReact);
 			// document.addEventListener('keydown', ctrlKernel, false );
 			// document.addEventListener('keyup', ctrlKernel, false );
-			// document.addEventListener('keydown', ctrlQuad, false );
-			// document.addEventListener('keyup', ctrlQuad, false );
-			document.addEventListener('keydown', ctrlFight);
-			document.addEventListener('keyup', ctrlFight);	
+			document.addEventListener('keydown', ctrlQuad, false );
+			document.addEventListener('keyup', ctrlQuad, false );
+			// document.addEventListener('keydown', ctrlFight);
+			// document.addEventListener('keyup', ctrlFight);	
 			setInterval('render()',60)
 			setInterval('flash()',10)		
 		});
 		$("#craft").button().click(function(){
 			$("#menu").dialog('close')
 			$('#selCraft').dialog('open')
+			radius=50
 		});
+
 		$("#level").button()
 		$("#engin").button().click(function(){});
+
     $('#selCraft').dialog({
     	title:'Select Craft',
-    	position:{at:"center center"},
-    	width:500,height:600,
+    	position:{at:"left center"},
+    	width:200,height:400,
     	autoOpen:false,
     	resizable:false,
     	draggable:false,
@@ -103,16 +95,22 @@
 		show:{effect: "clip",duration: 200},
 		hide:{effect: "clip",duration: 200},
 		buttons: {
-        "upload": function() {
-        },
-        'OK': function() {
-			$("#menu").dialog('open')
-			$('#selCraft').dialog('close')
-        }
+	        'Pick Out': function() {
+				$("#menu").dialog('open')
+				$('#selCraft').dialog('close')
+				radius=200
+	        }
       	}
     })
     $('#selCraft').dialog('close')
-    $('#tabs').tabs();
+
+    	$("#kernel").button()
+    	$("#quad").button()
+    	$("#fighter").button()
+    	$("#upload").button()
+
+
+    // $('#tabs').tabs();
     $('#state').dialog({
     	title:'State',
     	position:{at:"left top"},
@@ -123,6 +121,7 @@
     		$(".ui-dialog-titlebar-close").hide();
     	},
     })
+    $('#state').dialog('close')
 
 	var CoC={}
 	var camera, scene, renderer;
@@ -153,12 +152,13 @@
 		renderer.setSize( windowX, windowY );
 		renderer.setClearColor ('#000000',1)
 		document.body.appendChild( renderer.domElement );
+
 		// buildCraft(kernel)	
-		// buildCraft(quadcopter)
-		buildCraft(fighter)
+		buildCraft(quadcopter)
+		// buildCraft(fighter)
+		// 
 		scene.add(craft)
-		craft.position.set(0,20,-100)
-		console.log(craft)	
+		craft.position.set(0,20,-100)	
 
 		buildRunway()
 		scene.add(runway)
@@ -169,7 +169,7 @@
 		setBackground()
 		scene.add(background)
 
-		// renderer.domElement.addEventListener('mousemove', mousemoveReact);
+		renderer.domElement.addEventListener('mousemove', mousemoveReact);
 		document.addEventListener('keydown',escPress);
 		document.addEventListener('keyup',escPress);
 		// document.addEventListener('keydown', ctrlKernel, false );
@@ -180,34 +180,34 @@
 		// document.addEventListener('keyup', ctrlFight);
 
 
-		// setInterval('render()',60)
+		setInterval('render()',60)
 		// setInterval('flash()',10)
-		fire()
+		// fire()
 
 		render()
 	}
 
-	function fire(){
-		var geometry3,vertex, line,colors3 = [];
+	// function fire(){
+	// 	var geometry3,vertex, line,colors3 = [];
 
-		geometry3 = new THREE.Geometry()
-		vertex=new THREE.Vector3(0,20,-90);
-		geometry3.vertices.push( vertex );
-		colors3[0]=new THREE.Color(0x000000)
-		vertex=new THREE.Vector3(0,20,-89);
-		geometry3.vertices.push( vertex );
-		colors3[1]=new THREE.Color(0xff0000)
-		vertex=new THREE.Vector3(0,20,-88);
-		geometry3.vertices.push( vertex );
-		colors3[2]=new THREE.Color(0xffff00)
+	// 	geometry3 = new THREE.Geometry()
+	// 	vertex=new THREE.Vector3(0,20,-90);
+	// 	geometry3.vertices.push( vertex );
+	// 	colors3[0]=new THREE.Color(0x000000)
+	// 	vertex=new THREE.Vector3(0,20,-89);
+	// 	geometry3.vertices.push( vertex );
+	// 	colors3[1]=new THREE.Color(0xff0000)
+	// 	vertex=new THREE.Vector3(0,20,-88);
+	// 	geometry3.vertices.push( vertex );
+	// 	colors3[2]=new THREE.Color(0xffff00)
 
-		console.log(geometry3)
-		geometry3.colors = colors3;
+	// 	console.log(geometry3)
+	// 	geometry3.colors = colors3;
 
-		material=new THREE.LineBasicMaterial({vertexColors:THREE.VertexColors});
-		line=new THREE.Line(geometry3, material );
-		scene.add( line );
-	}
+	// 	material=new THREE.LineBasicMaterial({vertexColors:THREE.VertexColors});
+	// 	line=new THREE.Line(geometry3, material );
+	// 	scene.add( line );
+	// }
 
 	function escPress(event){
 		switch(event.keyCode){
@@ -221,11 +221,15 @@
     	craft.rotation.set(0,0,0)
     	presentGate=0
     	runway.resetColor(0)
+    	radius=200
     	thita=0.5,phai=-1.55;
-		renderer.domElement.removeEventListener('mousemove', mousemoveReact);
+		// renderer.domElement.removeEventListener('mousemove', mousemoveReact);
 		document.removeEventListener('keydown', ctrlFight);
 		document.removeEventListener('keyup', ctrlFight);
-		$("#menu").dialog('open');break;
+		$("#menu").dialog('open');
+		$('#selCraft').dialog('close')
+		$('#state').dialog('close')
+		break;
 		}
 
 	}
@@ -292,6 +296,11 @@
 			}
 			runway.resetColor(presentGate)
 		}
+
+		craft.accelera=craft.force.clone().divideScalar(craft.mass)
+		craft.rotaAcce=craft.torque.clone().applyMatrix4(craft.invIner) // !! not correct
+		eular=craft.rotation
+		craft.accelera.applyEuler(eular)
 
 		dv=craft.accelera.clone()
 		dv.multiplyScalar(dt)
@@ -369,9 +378,10 @@
 			   ,end=new THREE.Vector3().fromArray(model.jets[i].end)
 			   ,origin,vector
 			// end.sub(craft.massCenter)
-			vector=dir.clone().multiplyScalar(model.jets[i].len*2)
+			vector=dir.clone().multiplyScalar(model.jets[i].len)
 			origin=end.clone().sub(vector)
-			jets[i]=CoC.Arrow(origin,vector,0xff0000)
+			// jets[i]=CoC.Arrow(origin,vector,0xff0000)
+			jets[i]=fire(end,vector)
 			jets[i].name=model.jets[i].name
 			jets[i].force=dir.clone().multiplyScalar(len*100)
 			jets[i].torque=end.clone().cross(jets[i].force)
@@ -399,10 +409,10 @@
 					jets[i].torque.clone()
 				)
 			}
-			craft.accelera=craft.force.clone().divideScalar(craft.mass)
-			craft.rotaAcce=craft.torque.clone().applyMatrix4(craft.invIner) // !! not correct
-			eular=craft.rotation
-			craft.accelera.applyEuler(eular)
+			// craft.accelera=craft.force.clone().divideScalar(craft.mass)
+			// craft.rotaAcce=craft.torque.clone().applyMatrix4(craft.invIner) // !! not correct
+			// eular=craft.rotation
+			// craft.accelera.applyEuler(eular)
 		}
 	}
 
@@ -537,6 +547,28 @@
 		})
 		arrow=new THREE.Line(geometry,material)
 		return arrow
+	}
+
+	fire=function(end,vector){
+		var geometry3,vertex, line,colors3 = [];
+
+		geometry3 = new THREE.Geometry()
+		// vertex=new THREE.Vector3(0,20,-90);
+		geometry3.vertices.push( end);
+		colors3[0]=new THREE.Color(0xffff00)
+		console.log(end,vector.clone())
+		vertex=end.clone().sub(vector)
+		geometry3.vertices.push(vertex);
+		colors3[1]=new THREE.Color(0xff0000)
+		vertex=end.clone().sub(vector).sub(vector)
+		geometry3.vertices.push(vertex);
+		colors3[2]=new THREE.Color(0x000000)
+
+		geometry3.colors = colors3;
+
+		material=new THREE.LineBasicMaterial({vertexColors:THREE.VertexColors});
+		line=new THREE.Line(geometry3, material );
+		return line
 	}
 
 	function setAuxPlane(x1,x2,z1,z2){
@@ -741,68 +773,9 @@
 		}
 	}
 
-	function hilbert3D( center, size, iterations, v0, v1, v2, v3, v4, v5, v6, v7 ) {
 
-	// Default Vars
-	var center     = undefined !== center ? center : new THREE.Vector3( 0, 0, 0 ),
-		size       = undefined !== size ? size : 10,
-		half       = size / 2,
-		iterations = undefined !== iterations ? iterations : 1,
-		v0 = undefined !== v0 ? v0 : 0,
-		v1 = undefined !== v1 ? v1 : 1,
-		v2 = undefined !== v2 ? v2 : 2,
-		v3 = undefined !== v3 ? v3 : 3,
-		v4 = undefined !== v4 ? v4 : 4,
-		v5 = undefined !== v5 ? v5 : 5,
-		v6 = undefined !== v6 ? v6 : 6,
-		v7 = undefined !== v7 ? v7 : 7
-	;
 
-	var vec_s = [
-		new THREE.Vector3( center.x - half, center.y + half, center.z - half ),
-		new THREE.Vector3( center.x - half, center.y + half, center.z + half ),
-		new THREE.Vector3( center.x - half, center.y - half, center.z + half ),
-		new THREE.Vector3( center.x - half, center.y - half, center.z - half ),
-		new THREE.Vector3( center.x + half, center.y - half, center.z - half ),
-		new THREE.Vector3( center.x + half, center.y - half, center.z + half ),
-		new THREE.Vector3( center.x + half, center.y + half, center.z + half ),
-		new THREE.Vector3( center.x + half, center.y + half, center.z - half )
-	];
 
-	var vec = [
-		vec_s[ v0 ],
-		vec_s[ v1 ],
-		vec_s[ v2 ],
-		vec_s[ v3 ],
-		vec_s[ v4 ],
-		vec_s[ v5 ],
-		vec_s[ v6 ],
-		vec_s[ v7 ]
-	];
-
-	// Recurse iterations
-	if ( -- iterations >= 0 ) {
-
-		var tmp = [];
-
-		Array.prototype.push.apply( tmp, hilbert3D ( vec[ 0 ], half, iterations, v0, v3, v4, v7, v6, v5, v2, v1 ) );
-		Array.prototype.push.apply( tmp, hilbert3D ( vec[ 1 ], half, iterations, v0, v7, v6, v1, v2, v5, v4, v3 ) );
-		Array.prototype.push.apply( tmp, hilbert3D ( vec[ 2 ], half, iterations, v0, v7, v6, v1, v2, v5, v4, v3 ) );
-		Array.prototype.push.apply( tmp, hilbert3D ( vec[ 3 ], half, iterations, v2, v3, v0, v1, v6, v7, v4, v5 ) );
-		Array.prototype.push.apply( tmp, hilbert3D ( vec[ 4 ], half, iterations, v2, v3, v0, v1, v6, v7, v4, v5 ) );
-		Array.prototype.push.apply( tmp, hilbert3D ( vec[ 5 ], half, iterations, v4, v3, v2, v5, v6, v1, v0, v7 ) );
-		Array.prototype.push.apply( tmp, hilbert3D ( vec[ 6 ], half, iterations, v4, v3, v2, v5, v6, v1, v0, v7 ) );
-		Array.prototype.push.apply( tmp, hilbert3D ( vec[ 7 ], half, iterations, v6, v5, v2, v1, v0, v3, v4, v7 ) );
-
-		// Return recursive call
-		return tmp;
-
-	}
-
-	// Return complete Hilbert Curve.
-	return vec;
-
-}
 
 	init();
 </script>

@@ -4,9 +4,9 @@
 	<!-- <link rel="shortcut icon" href="iconCoC.png">   -->
 	<style>
 		body {
-		background-color: #000000;
-		margin: 0px;
-		overflow: hidden;
+			background-color: #000000;
+			margin: 0px;
+			overflow: hidden;
 		}
 
 		::-webkit-scrollbar {
@@ -29,14 +29,17 @@
 	    <button id='level'>Select Level</button><br>
 		<button id='engin'>Engineering</button>
 	</div>	
-	
+	<div id='motionStatus'>
+	</div>
 	<div id='selCraft'>
 		<button id='kernel'>Model-001 Kernel</button><br>
-	    <button id='quad'>Model-002 Quad</button><br>
-	    <button id='fighter'>Model-003 Fighter</button><br>
+		<button id='quad'>Model-002 Quad</button><br>
+		<button id='fighter'>Model-003 Fighter</button><br>
 		<button id='upload'>upload ...</button>
 	</div>	
-	<div id='state'>
+		<button id='straight'> straight</button><br>
+		<button id='lightning'>lightning</button><br>
+	<div id='selectRunway'>
 	</div>
 </center>
 <script>
@@ -55,9 +58,10 @@
 
 		$("#start").button().click(function(){
 			$("#menu").dialog('close')
-			$("#state").dialog('open')
+			$("#motionStatus").dialog('open')
 			timer.start()
-
+			// timer.stop()
+			// timer.running=false
 			renderer.domElement.requestPointerLock = 
 				renderer.domElement.requestPointerLock ||
 				renderer.domElement.mozRequestPointerLock ||
@@ -66,13 +70,41 @@
 			renderer.domElement.addEventListener('mousemove', mousemoveReact);
 			// document.addEventListener('keydown', ctrlKernel, false );
 			// document.addEventListener('keyup', ctrlKernel, false );
-			document.addEventListener('keydown', ctrlQuad, false );
-			document.addEventListener('keyup', ctrlQuad, false );
+			// document.addEventListener('keydown', ctrlQuad, false );	
+			// document.addEventListener('keyup', ctrlQuad, false );
 			// document.addEventListener('keydown', ctrlFight);
 			// document.addEventListener('keyup', ctrlFight);	
-			setInterval('render()',60)
+			// setInterval('render()',60)
+			runway.resetColor(0)
 			setInterval('flash()',10)		
 		});
+		function escPress(event){
+			switch(event.keyCode){
+			case 27:
+	    	// location.reload()
+	    	timer.stop()
+	    	// timer=new THREE.Clock()
+	    	// clearInterval('flash()')
+	    	console.log(timer.autoStart)
+	    	craft.accelera.set(0,0,0)
+	    	craft.velocity.set(0,0,0)
+	    	craft.position.set(0,20,-100)
+	    	craft.rotaAcce.set(0,0,0)
+	    	craft.rotaVelo.set(0,0,0)
+	    	craft.rotation.set(0,0,0)
+	    	presentGate=0
+	    	runway.resetColor(-1)
+	    	radius=200
+	    	thita=0.5,phai=-1.55;
+			// renderer.domElement.removeEventListener('mousemove', mousemoveReact);
+			// document.removeEventListener('keydown', ctrlFight);
+			// document.removeEventListener('keyup', ctrlFight);
+			$("#menu").dialog('open');
+			$('#selCraft').dialog('close')
+			$('#motionStatus').dialog('close')
+			break;
+			}
+		}
 		$("#craft").button().click(function(){
 			$("#menu").dialog('close')
 			$('#selCraft').dialog('open')
@@ -81,10 +113,25 @@
 
 		$("#level").button()
 		$("#engin").button().click(function(){});
+		$("#upload").button()
+
+	$('#motionStatus').dialog({
+    	title:'Motion Status',
+    	position:{at:"left bottom"},
+    	width:300,height:180,
+    	resizable:false,
+    	draggable:false,
+    	open: function(){
+    		$(".ui-dialog-titlebar-close").hide();
+    	},
+    	show:{effect: "clip",duration: 200},
+		hide:{effect: "clip",duration: 200}
+    })
+    $('#motionStatus').dialog('close')
 
     $('#selCraft').dialog({
     	title:'Select Craft',
-    	position:{at:"left center"},
+    	position:{at:"right center"},
     	width:200,height:400,
     	autoOpen:false,
     	resizable:false,
@@ -104,24 +151,45 @@
     })
     $('#selCraft').dialog('close')
 
-    	$("#kernel").button()
-    	$("#quad").button()
-    	$("#fighter").button()
-    	$("#upload").button()
+    	$("#kernel").button().click(function(){
+    		scene.remove(craft)
+    		buildCraft(kernel)
+    		scene.add(craft)
+    		craft.position.set(0,20,-100)
+    		removeAllCtrl()
+    		document.addEventListener('keydown', ctrlKernel, false );
+			document.addEventListener('keyup', ctrlKernel, false );
+    	})
+    	$("#quad").button().click(function(){
+    		scene.remove(craft)
+    		buildCraft(quadcopter)
+    		scene.add(craft)
+    		craft.position.set(0,20,-100)
+    		removeAllCtrl()
+    		document.addEventListener('keydown', ctrlQuad, false );	
+			document.addEventListener('keyup', ctrlQuad, false );
+    	})
+    	$("#fighter").button().click(function(){
+    		scene.remove(craft)
+    		buildCraft(fighter)
+    		scene.add(craft)
+    		craft.position.set(0,20,-100)
+    		removeAllCtrl()
+    		document.addEventListener('keydown', ctrlFight, false );
+			document.addEventListener('keyup', ctrlFight, false );
+    	})
+    	function removeAllCtrl(){
+    		document.removeEventListener('keydown',ctrlKernel);
+			document.removeEventListener('keyup',ctrlKernel);
+			document.removeEventListener('keydown',ctrlQuad);	
+			document.removeEventListener('keyup',ctrlQuad);
+			document.removeEventListener('keydown',ctrlFight);
+			document.removeEventListener('keyup',ctrlFight);
+		}
+
 
 
     // $('#tabs').tabs();
-    $('#state').dialog({
-    	title:'State',
-    	position:{at:"left top"},
-    	width:300,height:180,
-    	resizable:false,
-    	draggable:false,
-    	open: function(){
-    		$(".ui-dialog-titlebar-close").hide();
-    	},
-    })
-    $('#state').dialog('close')
 
 	var CoC={}
 	var camera, scene, renderer;
@@ -132,7 +200,7 @@
 	var x0=0,y0=0;
 	// var ts=new Date().getTime(),tt
 	// var t0=ts,t1,dt
-	var timer=new THREE.Clock(),tt,dt
+	var timer=new THREE.Clock(false),tt,dt
 
 	var s3d2=Math.sqrt(3)/2,s2d2=Math.sqrt(2)/2
 
@@ -153,9 +221,17 @@
 		renderer.setClearColor ('#000000',1)
 		document.body.appendChild( renderer.domElement );
 
+		// Default Craft
 		// buildCraft(kernel)	
-		buildCraft(quadcopter)
-		// buildCraft(fighter)
+		// buildCraft(quadcopter)	
+		buildCraft(fighter)
+
+		// document.addEventListener('keydown', ctrlKernel, false );
+		// document.addEventListener('keyup', ctrlKernel, false );
+		// document.addEventListener('keydown', ctrlQuad, false );
+		// document.addEventListener('keyup', ctrlQuad, false );
+		document.addEventListener('keydown', ctrlFight);
+		document.addEventListener('keyup', ctrlFight);
 		// 
 		scene.add(craft)
 		craft.position.set(0,20,-100)	
@@ -170,71 +246,14 @@
 		scene.add(background)
 
 		renderer.domElement.addEventListener('mousemove', mousemoveReact);
+
 		document.addEventListener('keydown',escPress);
 		document.addEventListener('keyup',escPress);
-		// document.addEventListener('keydown', ctrlKernel, false );
-		// document.addEventListener('keyup', ctrlKernel, false );
-		// document.addEventListener('keydown', ctrlQuad, false );
-		// document.addEventListener('keyup', ctrlQuad, false );
-		// document.addEventListener('keydown', ctrlFight);
-		// document.addEventListener('keyup', ctrlFight);
+
 
 
 		setInterval('render()',60)
-		// setInterval('flash()',10)
-		// fire()
-
-		render()
 	}
-
-	// function fire(){
-	// 	var geometry3,vertex, line,colors3 = [];
-
-	// 	geometry3 = new THREE.Geometry()
-	// 	vertex=new THREE.Vector3(0,20,-90);
-	// 	geometry3.vertices.push( vertex );
-	// 	colors3[0]=new THREE.Color(0x000000)
-	// 	vertex=new THREE.Vector3(0,20,-89);
-	// 	geometry3.vertices.push( vertex );
-	// 	colors3[1]=new THREE.Color(0xff0000)
-	// 	vertex=new THREE.Vector3(0,20,-88);
-	// 	geometry3.vertices.push( vertex );
-	// 	colors3[2]=new THREE.Color(0xffff00)
-
-	// 	console.log(geometry3)
-	// 	geometry3.colors = colors3;
-
-	// 	material=new THREE.LineBasicMaterial({vertexColors:THREE.VertexColors});
-	// 	line=new THREE.Line(geometry3, material );
-	// 	scene.add( line );
-	// }
-
-	function escPress(event){
-		switch(event.keyCode){
-		case 27:
-    	// location.reload()
-    	craft.accelera.set(0,0,0)
-    	craft.velocity.set(0,0,0)
-    	craft.position.set(0,20,-100)
-    	craft.rotaAcce.set(0,0,0)
-    	craft.rotaVelo.set(0,0,0)
-    	craft.rotation.set(0,0,0)
-    	presentGate=0
-    	runway.resetColor(0)
-    	radius=200
-    	thita=0.5,phai=-1.55;
-		// renderer.domElement.removeEventListener('mousemove', mousemoveReact);
-		document.removeEventListener('keydown', ctrlFight);
-		document.removeEventListener('keyup', ctrlFight);
-		$("#menu").dialog('open');
-		$('#selCraft').dialog('close')
-		$('#state').dialog('close')
-		break;
-		}
-
-	}
-
-
 
 	function setBackground(){
 		background=new THREE.Object3D
@@ -273,7 +292,7 @@
 		camera.lookAt( craft.position );
 		background.position.copy(camera.position)
 		renderer.render( scene, camera );
-		$('#state').html('<br>'+
+		$('#motionStatus').html('<br>'+
 			'accelera : '+craft.accelera.format()+'<br>'+
 			'velocity : '+craft.velocity.format()+'<br>'+
 			'position : '+craft.position.format()+'<br>'+
@@ -345,6 +364,7 @@
 			craft.massCenter.add(units[i].position)
 		}
 		craft.massCenter.multiplyScalar(1/craft.mass)
+		console.log(craft.massCenter)
 		
 		
 		console.log(shift )		
@@ -354,7 +374,7 @@
 			xp=units[i].position.x-craft.massCenter.x
 			yp=units[i].position.y-craft.massCenter.y
 			zp=units[i].position.z-craft.massCenter.z
-			craft.inertia.elements[0]+= yp*yp+xp*zp
+			craft.inertia.elements[0]+= yp*yp+zp*zp
 			craft.inertia.elements[5]+= xp*xp+zp*zp
 			craft.inertia.elements[10]+=xp*xp+yp*yp
 			craft.inertia.elements[1]-=xp*yp
@@ -390,7 +410,9 @@
 		}
 	
 		craft.invIner=invIner
+		console.log(shift.position.toArray())
 		shift.position.sub(craft.massCenter)
+		console.log(shift.position.toArray())
 		craft.add(shift)
 
 		craft.switchJets=function(name,onoff){
@@ -440,6 +462,15 @@
 
 		runway.resetColor=function(presentGate){
 			var p=presentGate,i=0
+			if(p<0){
+				for(g=0;g<checkPoint.length;g++){
+					checkPoint[g].visible=true
+					checkPoint[g].children[0].material.color.setHSL(0,0,1)
+				}
+				return 0
+			}
+
+
 			for(g=0;g<checkPoint.length;g++){
 				checkPoint[g].visible=false
 			}
@@ -556,7 +587,6 @@
 		// vertex=new THREE.Vector3(0,20,-90);
 		geometry3.vertices.push( end);
 		colors3[0]=new THREE.Color(0xffff00)
-		console.log(end,vector.clone())
 		vertex=end.clone().sub(vector)
 		geometry3.vertices.push(vertex);
 		colors3[1]=new THREE.Color(0xff0000)
@@ -772,10 +802,6 @@
 			craft.switchJets('back-0',trigger);break;
 		}
 	}
-
-
-
-
 
 	init();
 </script>

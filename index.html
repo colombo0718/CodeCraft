@@ -10,7 +10,7 @@
 		}
 
 		::-webkit-scrollbar {
-    		width: .0em;
+			width: .0em;
 		}
 	</style>
 </head>
@@ -23,51 +23,55 @@
 <!-- <script src="three.min.js"></script> -->
 <body oncontextmenu="return false;" onselectstart="return false;">
 <center>	
-	<div id='menu'><br>
-		<button id='start'>Start Game</button><br>
-	    <button id='craft'>Select Craft</button><br>
-	    <button id='level'>Select Level</button><br>
-		<button id='engin'>Engineering</button>
+	<div id='menu'>
+		<button id='play'>Play</button>
+		<button id='code'>Blockly</button><br>
+		<button id='craft'>Select Crafts</button><br>
+		<button id='runway'>Select Runway</button><br>
+		<button id='assemb'>Craft Assembly</button><br>
+		<button id='paint'>Craft Painting</button><br>
 	</div>	
 	<div id='motionStatus'>
 	</div>
-	<div id='selCraft'>
+	<div id='selectCraft'>
 		<button id='kernel'>Model-001 Kernel</button><br>
 		<button id='quad'>Model-002 Quad</button><br>
 		<button id='fighter'>Model-003 Fighter</button><br>
 		<button id='upload'>upload ...</button>
 	</div>	
-		<button id='straight'> straight</button><br>
-		<button id='lightning'>lightning</button><br>
+
 	<div id='selectRunway'>
+		<button id='straight'>advancing</button><br>
+		<button id='lightning'>lightning</button><br>
+		<button id='swinging'>swinging</button><br>	
+		<button id='sawtooth'>sawtooth</button><br>
 	</div>
 </center>
 <script>
-    $("#menu").dialog({
-    	title:'Main Menu',
-    	position:{at:"center center"},
-    	width:150,height:220,
-    	resizable:false,
-    	draggable:false,
-    	open: function(){
-    		$(".ui-dialog-titlebar-close").hide();
-    	},
+	$("#menu").dialog({
+		title:'Main Menu',
+		position:{at:"center center"},
+		width:150,height:230,
+		resizable:false,
+		draggable:false,
+		open: function(){
+			$(".ui-dialog-titlebar-close").hide();
+		},
 		show:{effect: "clip",duration: 200},
 		hide:{effect: "clip",duration: 200}
-    });
+	});
 
-		$("#start").button().click(function(){
+		$("#play").button().click(function(){
 			$("#menu").dialog('close')
 			$("#motionStatus").dialog('open')
 			timer.start()
-			// timer.stop()
-			// timer.running=false
+
 			renderer.domElement.requestPointerLock = 
 				renderer.domElement.requestPointerLock ||
 				renderer.domElement.mozRequestPointerLock ||
 				renderer.domElement.webkitRequestPointerLock;
 			renderer.domElement.requestPointerLock()
-			renderer.domElement.addEventListener('mousemove', mousemoveReact);
+			renderer.domElement.addEventListener('mousemove',mousemoveReact);
 			// document.addEventListener('keydown', ctrlKernel, false );
 			// document.addEventListener('keyup', ctrlKernel, false );
 			// document.addEventListener('keydown', ctrlQuad, false );	
@@ -75,136 +79,190 @@
 			// document.addEventListener('keydown', ctrlFight);
 			// document.addEventListener('keyup', ctrlFight);	
 			// setInterval('render()',60)
-			runway.resetColor(0)
+			runway.resetColor(1)
 			setInterval('flash()',10)		
 		});
 		function escPress(event){
 			switch(event.keyCode){
 			case 27:
-	    	// location.reload()
-	    	timer.stop()
-	    	// timer=new THREE.Clock()
-	    	// clearInterval('flash()')
-	    	console.log(timer.autoStart)
-	    	craft.accelera.set(0,0,0)
-	    	craft.velocity.set(0,0,0)
-	    	craft.position.set(0,20,-100)
-	    	craft.rotaAcce.set(0,0,0)
-	    	craft.rotaVelo.set(0,0,0)
-	    	craft.rotation.set(0,0,0)
-	    	presentGate=0
-	    	runway.resetColor(-1)
-	    	radius=200
-	    	thita=0.5,phai=-1.55;
+			// location.reload()
+			timer.stop()
+
+			console.log(timer.autoStart)
+			craft.accelera.set(0,0,0)
+			craft.velocity.set(0,0,0)
+			// craft.position.set(0,20,-100)
+			craft.position.copy(runway.checkPoint[0].position)
+			craft.rotaAcce.set(0,0,0)
+			craft.rotaVelo.set(0,0,0)
+			craft.rotation.set(0,0,0)
+			progress=0
+			runway.resetColor()
+			radius=200
+			thita=0.5,phai=-1.55;
 			// renderer.domElement.removeEventListener('mousemove', mousemoveReact);
 			// document.removeEventListener('keydown', ctrlFight);
 			// document.removeEventListener('keyup', ctrlFight);
 			$("#menu").dialog('open');
-			$('#selCraft').dialog('close')
+			$('#selectCraft').dialog('close')
 			$('#motionStatus').dialog('close')
 			break;
 			}
 		}
+
+		$("#code").button().click(function(){
+
+
+		});
+
 		$("#craft").button().click(function(){
 			$("#menu").dialog('close')
-			$('#selCraft').dialog('open')
+			$('#selectCraft').dialog('open')
 			radius=50
 		});
 
-		$("#level").button()
-		$("#engin").button().click(function(){});
-		$("#upload").button()
+		$("#runway").button().button().click(function(){
+			$("#menu").dialog('close')
+			$('#selectRunway').dialog('open')
+			radius=500
+		});
+		$("#assemb").button()
+		$("#paint").button()
+
+		
 
 	$('#motionStatus').dialog({
-    	title:'Motion Status',
-    	position:{at:"left bottom"},
-    	width:300,height:180,
-    	resizable:false,
-    	draggable:false,
-    	open: function(){
-    		$(".ui-dialog-titlebar-close").hide();
-    	},
-    	show:{effect: "clip",duration: 200},
+		title:'Motion Status',
+		position:{at:"left bottom"},
+		width:300,height:180,
+		resizable:false,
+		draggable:false,
+		open: function(){
+			$(".ui-dialog-titlebar-close").hide();
+		},
+		show:{effect: "clip",duration: 200},
 		hide:{effect: "clip",duration: 200}
-    })
-    $('#motionStatus').dialog('close')
+	})
+	$('#motionStatus').dialog('close')
 
-    $('#selCraft').dialog({
-    	title:'Select Craft',
-    	position:{at:"right center"},
-    	width:200,height:400,
-    	autoOpen:false,
-    	resizable:false,
-    	draggable:false,
-    	open: function(){
-    		$(".ui-dialog-titlebar-close").hide();
-    	},
+	$('#selectCraft').dialog({
+		title:'Select Craft',
+		position:{at:"right center"},
+		width:200,height:400,
+		autoOpen:false,
+		resizable:false,
+		draggable:false,
+		open: function(){
+			$(".ui-dialog-titlebar-close").hide();
+		},
 		show:{effect: "clip",duration: 200},
 		hide:{effect: "clip",duration: 200},
 		buttons: {
-	        'Pick Out': function() {
+			'Pick Out': function() {
 				$("#menu").dialog('open')
-				$('#selCraft').dialog('close')
+				$('#selectCraft').dialog('close')
 				radius=200
-	        }
-      	}
-    })
-    $('#selCraft').dialog('close')
+			}
+	  	}
+	})
+	$('#selectCraft').dialog('close')
 
-    	$("#kernel").button().click(function(){
-    		scene.remove(craft)
-    		buildCraft(kernel)
-    		scene.add(craft)
-    		craft.position.set(0,20,-100)
-    		removeAllCtrl()
-    		document.addEventListener('keydown', ctrlKernel, false );
+		$("#kernel").button().click(function(){
+			scene.remove(craft)
+			buildCraft(kernel)
+			scene.add(craft)
+			craft.position.copy(runway.checkPoint[0].position)
+			removeAllCtrl()
+			document.addEventListener('keydown', ctrlKernel, false );
 			document.addEventListener('keyup', ctrlKernel, false );
-    	})
-    	$("#quad").button().click(function(){
-    		scene.remove(craft)
-    		buildCraft(quadcopter)
-    		scene.add(craft)
-    		craft.position.set(0,20,-100)
-    		removeAllCtrl()
-    		document.addEventListener('keydown', ctrlQuad, false );	
+		})
+		$("#quad").button().click(function(){
+			scene.remove(craft)
+			buildCraft(quadcopter)
+			scene.add(craft)
+			craft.position.copy(runway.checkPoint[0].position)
+			removeAllCtrl()
+			document.addEventListener('keydown', ctrlQuad, false );	
 			document.addEventListener('keyup', ctrlQuad, false );
-    	})
-    	$("#fighter").button().click(function(){
-    		scene.remove(craft)
-    		buildCraft(fighter)
-    		scene.add(craft)
-    		craft.position.set(0,20,-100)
-    		removeAllCtrl()
-    		document.addEventListener('keydown', ctrlFight, false );
+		})
+		$("#fighter").button().click(function(){
+			scene.remove(craft)
+			buildCraft(fighter)
+			scene.add(craft)
+			craft.position.copy(runway.checkPoint[0].position)
+			removeAllCtrl()
+			document.addEventListener('keydown', ctrlFight, false );
 			document.addEventListener('keyup', ctrlFight, false );
-    	})
-    	function removeAllCtrl(){
-    		document.removeEventListener('keydown',ctrlKernel);
+		})
+		function removeAllCtrl(){
+			document.removeEventListener('keydown',ctrlKernel);
 			document.removeEventListener('keyup',ctrlKernel);
 			document.removeEventListener('keydown',ctrlQuad);	
 			document.removeEventListener('keyup',ctrlQuad);
 			document.removeEventListener('keydown',ctrlFight);
 			document.removeEventListener('keyup',ctrlFight);
 		}
+		$("#upload").button()
+
+	$('#selectRunway').dialog({
+		title:'Select Runway',
+		position:{at:"right center"},
+		width:200,height:400,
+		autoOpen:false,
+		resizable:false,
+		draggable:false,
+		open: function(){
+			$(".ui-dialog-titlebar-close").hide();
+		},
+		show:{effect: "clip",duration: 200},
+		hide:{effect: "clip",duration: 200},
+		buttons: {
+			'Pick Out': function() {
+				$("#menu").dialog('open')
+				$('#selectRunway').dialog('close')
+				radius=200
+			}
+	  	}
+	})
+	$('#selectRunway').dialog('close')	
+
+		$("#straight").button().click(function(){
+			scene.remove(runway)
+			buildRunway(straight)
+			scene.add(runway)
+		})
+		$("#lightning").button().click(function(){
+			scene.remove(runway)
+			buildRunway(lightning)
+			scene.add(runway)
+		})
+		$("#swinging").button().click(function(){
+			scene.remove(runway)
+			buildRunway(swinging)
+			scene.add(runway)
+		})
+		$("#sawtooth").button().click(function(){
+			scene.remove(runway)
+			buildRunway(sawtooth)
+			scene.add(runway)
+		})
 
 
-
-    // $('#tabs').tabs();
+	// $('#tabs').tabs();
 
 	var CoC={}
 	var camera, scene, renderer;
 	var windowX = window.innerWidth
 	   ,windowY = window.innerHeight;
-	var craft,runway,auxPlane,background;
+	var craft,runway,auxPlane,aimLine,background,vArrow;
+	var fieldCenter
 	var radius=200,thita=0.5,phai=-1.55;
-	var x0=0,y0=0;
-	// var ts=new Date().getTime(),tt
-	// var t0=ts,t1,dt
+	var mouseDx=0,mouseDy=0,mouseDz=0;
 	var timer=new THREE.Clock(false),tt,dt
 
 	var s3d2=Math.sqrt(3)/2,s2d2=Math.sqrt(2)/2
 
-	var presentGate=0
+	var progress=0
 
 	// init(); to the end 
 	function init() {
@@ -222,22 +280,26 @@
 		document.body.appendChild( renderer.domElement );
 
 		// Default Craft
-		// buildCraft(kernel)	
+		buildCraft(kernel)	
 		// buildCraft(quadcopter)	
-		buildCraft(fighter)
+		// buildCraft(fighter)
 
-		// document.addEventListener('keydown', ctrlKernel, false );
-		// document.addEventListener('keyup', ctrlKernel, false );
+		document.addEventListener('keydown', ctrlKernel, false );
+		document.addEventListener('keyup', ctrlKernel, false );
 		// document.addEventListener('keydown', ctrlQuad, false );
 		// document.addEventListener('keyup', ctrlQuad, false );
-		document.addEventListener('keydown', ctrlFight);
-		document.addEventListener('keyup', ctrlFight);
-		// 
-		scene.add(craft)
-		craft.position.set(0,20,-100)	
+		// document.addEventListener('keydown', ctrlFight);
+		// document.addEventListener('keyup', ctrlFight);
+		//
+			
 
-		buildRunway()
+		buildRunway(lightning)
+		buildRunway(straight)
 		scene.add(runway)
+		// console.log(runway.checkPoint[0].visible)
+
+		scene.add(craft)
+		craft.position.copy(runway.checkPoint[0].position)
 
 		setAuxPlane(-1,1,-1,10)
 		scene.add(auxPlane)
@@ -246,10 +308,10 @@
 		scene.add(background)
 
 		renderer.domElement.addEventListener('mousemove', mousemoveReact);
+		renderer.domElement.addEventListener("mousewheel",mousewheelHandler);
 
 		document.addEventListener('keydown',escPress);
 		document.addEventListener('keyup',escPress);
-
 
 
 		setInterval('render()',60)
@@ -283,6 +345,16 @@
 			Math.round(this.z*100)/100,
 			this.order
 		]
+	}
+
+	function velocityArrow(){
+		scene.remove(vArrow)
+
+		var color=new THREE.Color(0x0000ff),head=5
+		if(craft.velocity.length()<25){head=null}
+		vArrow=CoC.Arrow(craft.position,craft.velocity,color,head)
+
+		scene.add(vArrow)
 	}	
 
 	function render(){
@@ -291,6 +363,8 @@
 		camera.position.y=craft.position.y+radius*Math.sin(thita)		
 		camera.lookAt( craft.position );
 		background.position.copy(camera.position)
+		plotAimLine()
+		velocityArrow()
 		renderer.render( scene, camera );
 		$('#motionStatus').html('<br>'+
 			'accelera : '+craft.accelera.format()+'<br>'+
@@ -299,7 +373,7 @@
 			'rotaAcce : '+craft.rotaAcce.format()+'<br>'+
 			'rotaVelo : '+craft.rotaVelo.format()+'<br>'+
 			'rotation : '+craft.rotation.format()
-			)
+		)
 	}
 
 	function flash(){	
@@ -308,12 +382,13 @@
 		dt=timer.getDelta()
 		tt=timer.getElapsedTime()
 
-		if(runway.sensor(presentGate)==true){
-			presentGate+=1
-			if(presentGate==runway.children.length){
-				presentGate=0
+		if(runway.sensor(progress)==true){
+			progress+=1
+			if(progress==runway.children.length){
+				timre.stop()
+				progress=0
 			}
-			runway.resetColor(presentGate)
+			runway.resetColor(progress)
 		}
 
 		craft.accelera=craft.force.clone().divideScalar(craft.mass)
@@ -337,8 +412,8 @@
 	}
 
 	function buildCraft(model){
-		model=new model // !!??
 		craft=new THREE.Object3D()
+		model=new model()
 
 		craft.mass=model.units.length
 		craft.radius=0
@@ -438,18 +513,44 @@
 		}
 	}
 
-	function buildRunway(){
-		var checkPoint=[]
+	function plotLine(p1,p2){
+		var geometry,vertex,material,line
+		geometry=new THREE.Geometry();
+		vertex=new THREE.Vector3();
+		vertex.fromArray(p1)
+		geometry.vertices.push(vertex);
+		vertex=new THREE.Vector3();
+		vertex.fromArray(p2)
+		geometry.vertices.push(vertex);
+		material=new THREE.LineBasicMaterial({
+			color:0xff0000
+		})
+		line=new THREE.Line(geometry,material)
+		return line
+	}		
+
+	function buildRunway(model){
+		var checkPoint=[],connectLine=[]
 		runway=new THREE.Object3D
+		fieldCenter=new THREE.Object3D
+		fieldCenter.position.set(0,20,500)
 
-		for(n=0;n<10;n++){
-			checkPoint[n]=setCheckPoint([0,20,n*100])
-			runway.add(checkPoint[n])
+		for(n=0;n<model.spot.length;n++){
+			checkPoint[n]=makeCheckPoint(model.spot[n].position)			
+			if(n>0){
+				var p1,p2
+				p1=model.spot[n].position
+				p2=model.spot[n-1].position
+				connectLine[n]=plotLine(p1,p2)
+			}
+			runway.add(checkPoint[n],connectLine[n])
 		}
- 
+		checkPoint[0].visible=false
+		craft.position.copy(checkPoint[0].position)
+		runway.checkPoint=checkPoint
 
-		runway.sensor=function(presentGate){
-			var p=presentGate
+		runway.sensor=function(){
+			var p=progress
 
 			var distance=craft.position.clone()
 				.sub(checkPoint[p].position).length()
@@ -458,44 +559,59 @@
 				return true
 			}
 		}
-		runway.sensor(0)
+		// runway.sensor(0)
 
-		runway.resetColor=function(presentGate){
-			var p=presentGate,i=0
-			if(p<0){
-				for(g=0;g<checkPoint.length;g++){
+		runway.resetColor=function(){
+			var p=progress,i
+			if(p==0){
+				for(g=1;g<checkPoint.length;g++){
 					checkPoint[g].visible=true
 					checkPoint[g].children[0].material.color.setHSL(0,0,1)
+					
+					if(g>0){
+						console.log(connectLine[g].geometry)
+						connectLine[g].visible=true
+						connectLine[g].material.color.setRGB(1,0,0)
+					}	
 				}
 				return 0
 			}
 
-
-			for(g=0;g<checkPoint.length;g++){
+			checkPoint[0].visible=false
+			for(g=1;g<checkPoint.length;g++){
 				checkPoint[g].visible=false
+				connectLine[g].visible=false
 			}
+
+			i=0
 			for(g=p;g<p+5;g++){
-				ll=0
-				if(g>=checkPoint.length){ll=checkPoint.length}
-					console.log(g-ll)
-				for(c=0;c<checkPoint[g-ll].children.length;c++){
-					var H=checkPoint[g-ll].children[c].material.color.getHSL().h
-					   ,S=checkPoint[g-ll].children[c].material.color.getHSL().s
-					   ,L=checkPoint[g-ll].children[c].material.color.getHSL().l
-					checkPoint[g-ll].visible=true
-					checkPoint[g-ll].children[c].material.color.setHSL(H,S,1-i*0.2)
+				if(g>=checkPoint.length){break;}
+				console.log(g)
+				var H=checkPoint[g].children[0].material.color.getHSL().h
+				   ,S=checkPoint[g].children[0].material.color.getHSL().s
+				   ,L=checkPoint[g].children[0].material.color.getHSL().l
+				checkPoint[g].visible=true
+				checkPoint[g].children[0].material.color.setHSL(H,S,1-i*0.2)
+				if(i>0){
+					var H=connectLine[g].material.color.getHSL().h
+					   ,S=connectLine[g].material.color.getHSL().s
+					   ,L=connectLine[g].material.color.getHSL().l
+					connectLine[g].material.color.setHSL(H,S,0.5-i*0.1)   
+					connectLine[g].visible=true 
 				}
 				i++
 			}
+			
 		}
 		// runway.resetColor(0)
-	}
+	}	
 
-	function setCheckPoint(position){
+	function makeCheckPoint(position){
 		var geometry,vertex,material,diamond
 		var position,normal,arrow,lineColor=0xffffff
 		var checkPoint=new THREE.Object3D
 		var r=craft.radius
+		r=4
 
 		geometry=new THREE.Geometry();
 		vertex=new THREE.Vector3(0,-r,0);
@@ -525,7 +641,7 @@
 		vertex=new THREE.Vector3(0,-r,0);
 		geometry.vertices.push( vertex );
 
-		material=new THREE.LineBasicMaterial({
+		material =new THREE.LineBasicMaterial({
 			color:lineColor,
 		})
 
@@ -543,7 +659,7 @@
 		length=vector.length()
 		zz=new THREE.Vector3(0,0,1)
 
-		if(head==null){head=length*.3}
+		if(head==null){head=length*.2}
 		if(vector.clone().normalize().equals(zz) ||
 		   vector.clone().normalize().negate().equals(zz)){
 			perpen1=new THREE.Vector3(1,0,0)
@@ -586,10 +702,10 @@
 		geometry3 = new THREE.Geometry()
 		// vertex=new THREE.Vector3(0,20,-90);
 		geometry3.vertices.push( end);
-		colors3[0]=new THREE.Color(0xffff00)
+		colors3[0]=new THREE.Color(0xffffff)
 		vertex=end.clone().sub(vector)
-		geometry3.vertices.push(vertex);
-		colors3[1]=new THREE.Color(0xff0000)
+		geometry3.vertices.push(vertex)
+		colors3[1]=new THREE.Color(0xff00ff)
 		vertex=end.clone().sub(vector).sub(vector)
 		geometry3.vertices.push(vertex);
 		colors3[2]=new THREE.Color(0x000000)
@@ -597,9 +713,45 @@
 		geometry3.colors = colors3;
 
 		material=new THREE.LineBasicMaterial({vertexColors:THREE.VertexColors});
+		material.opacity=0.2
 		line=new THREE.Line(geometry3, material );
 		return line
 	}
+
+	function plotAimLine(){
+		runway.remove(aimLine)
+		aimLine = new THREE.Object3D
+		var geometry,vertex,material,line
+		// for(var i=progress;i<runway.children.length;i++){
+		geometry=new THREE.Geometry();
+		geometry.vertices.push(craft.position);
+		geometry.vertices.push(runway.checkPoint[progress].position)
+		
+		material=new THREE.LineBasicMaterial({
+			color:0xff0000,
+		})
+		// material.opacity=0.2
+		line = new THREE.Line(geometry,material)
+		aimLine.add( line );
+
+		runway.add(aimLine)
+	}
+
+	// function plotLine(p1,p2){
+	// 	var geometry,material,line
+	// 	geometry=new THREE.Geometry();
+	// 	geometry.vertices.push(p1);
+	// 	geometry.vertices.push(p2)
+	// 	// var color=new THREE.Color(0xff0000);
+	// 	material=new THREE.LineBasicMaterial({
+	// 		color:0xff0000
+	// 	})
+	// 	line=new THREE.Line(geometry,material)
+	// 	return line
+	// 	var lineObj=new THREE.Object3D
+	// 	lineObj.add(line)
+	// 	return lineObj
+	// }
 
 	function setAuxPlane(x1,x2,z1,z2){
 		var geometry,vertex,material,line
@@ -646,34 +798,34 @@
 	function UnitTexture(kind){
 		var c1,c2 // color outside & inside
 		switch(kind){
-			case  1:c1='#ffffff'        ;break; // iron
-			case  2:c1='#333333'        ;break; // carbon
-			case  3:c1='#ff0000'        ;break; // heat vibrate
-			case  4:c1='#ffff00'        ;break; // electromagnetic
-			case  5:c1='#0000ff'        ;break; // grvity subspace
+			case  1:c1='#ffffff'		;break; // iron
+			case  2:c1='#333333'		;break; // carbon
+			case  3:c1='#ff0000'		;break; // heat vibrate
+			case  4:c1='#ffff00'		;break; // electromagnetic
+			case  5:c1='#0000ff'		;break; // grvity subspace
 
-			case  6:c1='#ff7575'        ;break; // steel
-			case  7:c1='#FFFF6F'        ;break; // jet
-			case  8:c1='deepskyblue'    ;break; // magnet
-			case  9:c1='sandybrown'     ;break; // inertia
-			case 10:c1='greenyellow'    ;break; // inertia
+			case  6:c1='#ff7575'		;break; // steel
+			case  7:c1='#FFFF6F'		;break; // jet
+			case  8:c1='deepskyblue'	;break; // magnet
+			case  9:c1='sandybrown'	 ;break; // inertia
+			case 10:c1='greenyellow'	;break; // inertia
 			case 11:c1='mediumorchid'   ;break; // inertia
 
-			case 12:c1='silver'         ;break; // inertia
+			case 12:c1='silver'		 ;break; // inertia
 
-			case 13:c1='#FF0000'        ;break; // inertia
-			case 14:c1='gold'           ;break; // inertia
-			case 15:c1='#2828FF'        ;break; // inertia
-			case 16:c1='orangered'      ;break; // inertia
-			case 17:c1='#00FF00'        ;break; // inertia
-			case 18:c1='#9F009F'        ;break; // inertia
+			case 13:c1='#FF0000'		;break; // inertia
+			case 14:c1='gold'		   ;break; // inertia
+			case 15:c1='#2828FF'		;break; // inertia
+			case 16:c1='orangered'	  ;break; // inertia
+			case 17:c1='#00FF00'		;break; // inertia
+			case 18:c1='#9F009F'		;break; // inertia
 
-			case 19:c1='darkred'        ;break; // inertia
-			case 20:c1='#5B4B00'        ;break; // inertia
-			case 21:c1='#000079'        ;break; // inertia
-			case 22:c1='#842B00'        ;break; // inertia
-			case 23:c1='#006000'        ;break; // inertia
-			case 24:c1='#460046'        ;break; // inertia
+			case 19:c1='darkred'		;break; // inertia
+			case 20:c1='#5B4B00'		;break; // inertia
+			case 21:c1='#000079'		;break; // inertia
+			case 22:c1='#842B00'		;break; // inertia
+			case 23:c1='#006000'		;break; // inertia
+			case 24:c1='#460046'		;break; // inertia
 		}
 
 		var canvas=document.createElement('canvas');
@@ -694,18 +846,24 @@
 	}
 
 	function mousemoveReact(event){
+		// console.log(event)
 		if(event.which==1){
 			renderer.domElement.style.cursor = "none"
-			x0=event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-			y0=event.movementY || event.mozMovementY || event.webkitMovementY || 0;
-			phai+=x0*0.002
-			thita+=y0*0.002
+			mouseDx=event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+			mouseDy=event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+			phai+=mouseDx*0.002
+			thita+=mouseDy*0.002
 			if(thita>Math.PI*0.49){thita=Math.PI*0.49}
 			if(thita<-Math.PI*0.49){thita=-Math.PI*0.49}
 		}else{   
 			renderer.domElement.style.cursor = "crosshair"
 		}
 	}
+	function mousewheelHandler(event){
+		// console.log(event.deltaY)
+		mouseDz=event.deltaY
+		radius+=mouseDz/20
+	}	
 
 	function ctrlKernel(event){
 		trigger=false
@@ -802,6 +960,122 @@
 			craft.switchJets('back-0',trigger);break;
 		}
 	}
+
+	var straight={
+		"cocType":"path",
+		"spot":[
+		{"position":[0,20,-100],"direction":[0,0,1]},
+		{"position":[0,20,-50],"direction":[0,0,1]},
+		{"position":[0,20,  0],"direction":[0,0,1]},
+		{"position":[0,20, 50],"direction":[0,0,1]},
+		{"position":[0,20,100],"direction":[0,0,1]},
+		{"position":[0,20,150],"direction":[0,0,1]},
+		{"position":[0,20,200],"direction":[0,0,1]},
+		{"position":[0,20,250],"direction":[0,0,1]},
+		{"position":[0,20,300],"direction":[0,0,1]},
+		{"position":[0,20,350],"direction":[0,0,1]},
+		{"position":[0,20,400],"direction":[0,0,1]},
+		{"position":[0,20,450],"direction":[0,0,1]},
+		{"position":[0,20,500],"direction":[0,0,1]},
+		{"position":[0,20,550],"direction":[0,0,1]},
+		{"position":[0,20,600],"direction":[0,0,1]},
+		{"position":[0,20,650],"direction":[0,0,1]},
+		{"position":[0,20,700],"direction":[0,0,1]},
+		{"position":[0,20,750],"direction":[0,0,1]},
+		{"position":[0,20,800],"direction":[0,0,1]},
+		{"position":[0,20,850],"direction":[0,0,1]},
+		{"position":[0,20,900],"direction":[0,0,1]},
+		{"position":[0,20,950],"direction":[0,0,1]},
+		{"position":[0,20,1000],"direction":[0,0,1]},
+		]
+	}
+
+	var sawtooth={
+		"cocType":"path",
+		"spot":[
+		{"position":[0,20,-100],"direction":[0,0,1]},
+		{"position":[0,50,-100],"direction":[0,0,1]},
+		{"position":[0,20,  0],"direction":[0,0,1]},
+		{"position":[0,50,  0],"direction":[0,0,1]},
+		{"position":[0,20,100],"direction":[0,0,1]},
+		{"position":[0,50,100],"direction":[0,0,1]},
+		{"position":[0,20,200],"direction":[0,0,1]},
+		{"position":[0,50,200],"direction":[0,0,1]},
+		{"position":[0,20,300],"direction":[0,0,1]},
+		{"position":[0,50,300],"direction":[0,0,1]},
+		{"position":[0,20,400],"direction":[0,0,1]},
+		{"position":[0,50,400],"direction":[0,0,1]},
+		{"position":[0,20,500],"direction":[0,0,1]},
+		{"position":[0,50,500],"direction":[0,0,1]},
+		{"position":[0,20,600],"direction":[0,0,1]},
+		{"position":[0,50,600],"direction":[0,0,1]},
+		{"position":[0,20,700],"direction":[0,0,1]},
+		{"position":[0,50,700],"direction":[0,0,1]},
+		{"position":[0,20,800],"direction":[0,0,1]},
+		{"position":[0,50,800],"direction":[0,0,1]},
+		{"position":[0,20,900],"direction":[0,0,1]},
+		{"position":[0,50,900],"direction":[0,0,1]},
+		{"position":[0,20,1000],"direction":[0,0,1]},
+		]
+	}
+
+	var lightning={
+		"cocType":"path",
+		"spot":[
+		{"position":[   0,20,-100],"direction":[0,0,1]},
+		{"position":[   0,20,-50],"direction":[0,0,1]},
+		{"position":[ 100,20,  0],"direction":[0,0,1]},
+		{"position":[   0,20, 50],"direction":[0,0,1]},
+		{"position":[-100,20,100],"direction":[0,0,1]},
+		{"position":[   0,20,150],"direction":[0,0,1]},
+		{"position":[ 100,20,200],"direction":[0,0,1]},
+		{"position":[   0,20,250],"direction":[0,0,1]},
+		{"position":[-100,20,300],"direction":[0,0,1]},
+		{"position":[   0,20,350],"direction":[0,0,1]},
+		{"position":[ 100,20,400],"direction":[0,0,1]},
+		{"position":[   0,20,450],"direction":[0,0,1]},
+		{"position":[-100,20,500],"direction":[0,0,1]},
+		{"position":[   0,20,550],"direction":[0,0,1]},
+		{"position":[ 100,20,600],"direction":[0,0,1]},
+		{"position":[   0,20,650],"direction":[0,0,1]},
+		{"position":[-100,20,700],"direction":[0,0,1]},
+		{"position":[   0,20,750],"direction":[0,0,1]},
+		{"position":[ 100,20,800],"direction":[0,0,1]},
+		{"position":[   0,20,850],"direction":[0,0,1]},
+		{"position":[-100,20,900],"direction":[0,0,1]},
+		{"position":[   0,20,950],"direction":[0,0,1]},
+		{"position":[ 100,20,1000],"direction":[0,0,1]},
+		]
+	}
+
+	var swinging={
+		"cocType":"path",
+		"spot":[
+		{"position":[   0,20,-100],"direction":[0,0,1]},
+		{"position":[   0,20,-50],"direction":[0,0,1]},
+		{"position":[ 100,50,  0],"direction":[0,0,1]},
+		{"position":[   0,20, 50],"direction":[0,0,1]},
+		{"position":[-100,50,100],"direction":[0,0,1]},
+		{"position":[   0,20,150],"direction":[0,0,1]},
+		{"position":[ 100,50,200],"direction":[0,0,1]},
+		{"position":[   0,20,250],"direction":[0,0,1]},
+		{"position":[-100,50,300],"direction":[0,0,1]},
+		{"position":[   0,20,350],"direction":[0,0,1]},
+		{"position":[ 100,50,400],"direction":[0,0,1]},
+		{"position":[   0,20,450],"direction":[0,0,1]},
+		{"position":[-100,50,500],"direction":[0,0,1]},
+		{"position":[   0,20,550],"direction":[0,0,1]},
+		{"position":[ 100,50,600],"direction":[0,0,1]},
+		{"position":[   0,20,650],"direction":[0,0,1]},
+		{"position":[-100,50,700],"direction":[0,0,1]},
+		{"position":[   0,20,750],"direction":[0,0,1]},
+		{"position":[ 100,50,800],"direction":[0,0,1]},
+		{"position":[   0,20,850],"direction":[0,0,1]},
+		{"position":[-100,50,900],"direction":[0,0,1]},
+		{"position":[   0,20,950],"direction":[0,0,1]},
+		{"position":[ 100,50,1000],"direction":[0,0,1]},
+		]
+	}	
 
 	init();
 </script>

@@ -853,7 +853,7 @@ body .ui-tooltip {
 .ui-widget-content {
 	border: 1px solid #00ffff;
 	color: #00ffff;
-	background:rgba(0,255,255,0.1);
+	background:rgba(0,25,25,0.5);
 }
 .ui-widget-content a {
 	color: #222222;
@@ -861,7 +861,7 @@ body .ui-tooltip {
 .ui-widget-header {
 	border: 1px solid #00ffff;
 	color: #00ffff;
-	background:rgba(0,255,255,0.1);
+	background:rgba(0,25,25,0.5);
 	/*font-weight: bold;*/
 }
 .ui-widget-header a {

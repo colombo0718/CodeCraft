@@ -63,6 +63,71 @@
 		return {units:units,jets:jets}
 	}
 
+	// var kernel={
+	// 	"cocType":"model",
+	// 	"units":[
+	// 	//	locator gyroscope
+	// 	{"position":[ 0, 0, 0],"type":17,"color":'#ff0000'},
+	// 	{"position":[ 1, 0, 0],"type":17,"color":'#ff0000'},
+	// 	{"position":[-1, 0, 0],"type":17,"color":'#ff0000'},
+	// 	{"position":[ 0, 1, 0],"type":17,"color":'#ff0000'},
+	// 	{"position":[ 0,-1, 0],"type":17,"color":'#ff0000'},
+	// 	{"position":[ 0, 0, 1],"type":17,"color":'#ff0000'},
+	// 	{"position":[ 0, 0,-1],"type":17,"color":'#ff0000'},
+	// 	//	CPU
+	// 	{"position":[-1,-1,-1],"type":14,"color":'#ff0000'},
+	// 	{"position":[ 0,-1,-1],"type":14,"color":'#ff0000'},
+	// 	{"position":[ 1,-1,-1],"type":14,"color":'#ff0000'},
+	// 	{"position":[-1, 0,-1],"type":14,"color":'#ff0000'},
+	// 	// {"position":[ 0, 0,-1],"type":14,"color":'#ff0000'},
+	// 	{"position":[ 1, 0,-1],"type":14,"color":'#ff0000'},
+	// 	{"position":[-1, 1,-1],"type":14,"color":'#ff0000'},
+	// 	{"position":[ 0, 1,-1],"type":14,"color":'#ff0000'},
+	// 	{"position":[ 1, 1,-1],"type":14,"color":'#ff0000'},
+
+	// 	{"position":[-1,-1, 0],"type":14,"color":'#ff0000'},
+	// 	// {"position":[ 0,-1, 0],"type":14,"color":'#ff0000'},
+	// 	{"position":[ 1,-1, 0],"type":14,"color":'#ff0000'},
+	// 	// {"position":[-1, 0, 0],"type":14,"color":'#ff0000'},
+	// 	// {"position":[ 0, 0, 0],"type":14,"color":'#ff0000'},
+	// 	// {"position":[ 1, 0, 0],"type":14,"color":'#ff0000'},
+	// 	{"position":[-1, 1, 0],"type":14,"color":'#ff0000'},
+	// 	// {"position":[ 0, 1, 0],"type":14,"color":'#ff0000'},
+	// 	{"position":[ 1, 1, 0],"type":14,"color":'#ff0000'},
+
+	// 	{"position":[-1,-1, 1],"type":14,"color":'#ff0000'},
+	// 	{"position":[ 0,-1, 1],"type":14,"color":'#ff0000'},
+	// 	{"position":[ 1,-1, 1],"type":14,"color":'#ff0000'},
+	// 	{"position":[-1, 0, 1],"type":14,"color":'#ff0000'},
+	// 	// {"position":[ 0, 0, 1],"type":14,"color":'#ff0000'},
+	// 	{"position":[ 1, 0, 1],"type":14,"color":'#ff0000'},
+	// 	{"position":[-1, 1, 1],"type":14,"color":'#ff0000'},
+	// 	{"position":[ 0, 1, 1],"type":14,"color":'#ff0000'},
+	// 	{"position":[ 1, 1, 1],"type":14,"color":'#ff0000'},
+	// 	//	jets
+	// 	{"position":[ 0, 0,-3],"type": 6,"color":'#ff0000'},
+	// 	{"position":[ 0, 0,-2],"type": 9,"color":'#ff0000'},
+	// 	{"position":[ 0, 0, 3],"type": 6,"color":'#ff0000'},
+	// 	{"position":[ 0, 0, 2],"type": 9,"color":'#ff0000'},
+	// 	{"position":[ 0,-3, 0],"type": 6,"color":'#ff0000'},
+	// 	{"position":[ 0,-2, 0],"type": 9,"color":'#ff0000'},
+	// 	{"position":[ 0, 3, 0],"type": 6,"color":'#ff0000'},
+	// 	{"position":[ 0, 2, 0],"type": 9,"color":'#ff0000'},
+	// 	{"position":[-3, 0, 0],"type": 6,"color":'#ff0000'},
+	// 	{"position":[-2, 0, 0],"type": 9,"color":'#ff0000'},
+	// 	{"position":[ 3, 0, 0],"type": 6,"color":'#ff0000'},
+	// 	{"position":[ 2, 0, 0],"type": 9,"color":'#ff0000'},
+	// 	],
+	// 	jets:[
+	// 	{"name":"up"   ,"len":2,"dir":[ 0, 1, 0],"end":[ 0,-4, 0]},
+	// 	{"name":"down" ,"len":2,"dir":[ 0,-1, 0],"end":[ 0, 4, 0]},
+	// 	{"name":"left" ,"len":2,"dir":[ 1, 0, 0],"end":[-4, 0, 0]},
+	// 	{"name":"right","len":2,"dir":[-1, 0, 0],"end":[ 4, 0, 0]},
+	// 	{"name":"front","len":2,"dir":[ 0, 0, 1],"end":[ 0, 0,-4]},
+	// 	{"name":"back" ,"len":2,"dir":[ 0, 0,-1],"end":[ 0, 0, 4]},
+	// 	]
+	// }	
+
 	function quadcopter(){
 		var s2d2=Math.sqrt(2)/2
 		units=[

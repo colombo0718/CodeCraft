@@ -1,14 +1,13 @@
 <html lang="en">
 <head>
+	<meta charset="utf-8">
 	<title>CodeCraft</title>
-	<!-- <link rel="shortcut icon" href="iconCoC.png">   -->
+	<!-- <link rel="shortcut icon" href="iconCoC.png">	 -->
 	<style>
 		body {
-			background-color: #000000;
 			margin: 0px;
 			overflow: hidden;
 		}
-
 		::-webkit-scrollbar {
 			width: .0em;
 		}
@@ -18,60 +17,247 @@
 <script src="https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
 <script src="https://ajax.googleapis.com/ajax/libs/jqueryui/1.11.3/jquery-ui.min.js"></script>
 <link rel="stylesheet" href="jquery-ui/TechGreen.css">
+<!-- <link rel="stylesheet" href="jquery-ui/TechOrange.css"> -->
+<script src="https://blockly-demo.appspot.com/static/blockly_compressed.js"></script>
+<script src="https://blockly-demo.appspot.com/static/blocks_compressed.js"></script>
+<script src="https://blockly-demo.appspot.com/static/javascript_compressed.js"></script>
+<script src="https://blockly-demo.appspot.com/static/msg/js/en.js"></script>
+<script src="https://ace.c9.io/build/src/ace.js"></script>
+<script src="jquery.knob.js"></script>
+<script src="CodeCraft.js"></script>
+<script src="ccBlocks.js"></script>
+<script src="ccGenerator.js"></script>
 <script src='craftData.js'></script>
-<!-- <script src="craftData.js"></script> -->
-<!-- <script src="three.min.js"></script> -->
+<script src='routeData.js'></script>
 <body oncontextmenu="return false;" onselectstart="return false;">
-<center>	
-	<div id='menu'>
-		<button id='play'>Play</button>
-		<button id='code'>Blockly</button><br>
-		<button id='craft'>Select Crafts</button><br>
-		<button id='runway'>Select Runway</button><br>
-		<button id='assemb'>Craft Assembly</button><br>
-		<button id='paint'>Craft Painting</button><br>
-	</div>	
-	<div id='motionStatus'>
+
+	<div id="blocklyDiv" style="position:absolute; top:0; left:-60%; height: 100% ; width:60%;"></div>
+
+	<div id="aceEditor" style="position:absolute; top:0; left:60%; height: 100%; width:40%;">
 	</div>
+
+	<div id='menu'>
+		<button id='play'>Play</button><br>
+		<button id='code'>Blockly</button><br>
+		<button id='craft'>Craft</button><br>
+		<button id='runway'>Route</button><br>
+		<button id='github'>Github</button><br>
+	</div>
+
+<script>/*
+	<div id='dashboard'>
+		<div style="position:absolute;left:10px;top:0px;">Time</div>
+		<div style="position:absolute;left:10px;top:20px;">	
+			<input class="dial min" data-fgColor="#00ffff" data-thickness=".5" data-displayInput=false data-bgColor="rgba(0,0,0,0)" readonly data-width="80" data-height="80" data-max='10'>
+		</div>		
+		<div style="position:absolute;left:10px;top:20px;">
+			<input class="dial dec" data-fgColor="#0000ff" data-thickness=" 1" data-displayInput=false data-bgColor="rgba(0,0,0,0)" readonly data-width="80" data-height="80" data-cursor=true data-step=".01" data-max='10'>
+		</div>	
+		<div style="position:absolute;left:10px;top:20px;">
+			<input class="dial sec" data-fgColor="#ff00ff" data-thickness=".2" data-displayInput=false data-bgColor="rgba(0,0,0,0)" readonly data-width="80" data-height="80" data-cursor=true data-max='60'>
+		</div>
+		<div style="position:absolute;left:10px;top:20px;">
+			<input class="dial sec" data-fgColor="#ffffff" data-thickness="0.0" data-bgColor="rgba(0,0,0,0)" readonly data-width="80" data-height="80" data-step='0.1' data-cursor=true data-max='600' data-skin="ring">
+		</div> 
+		<!-- -------------------------------------------------------------------------- -->
+		<div style="position:absolute;left:100px;top:0px;">Acc</div>
+		<div style="position:absolute;left:100px;top:20px">
+			<input class="dial acc leng" data-fgColor="#ffffff" data-thickness=".0" data-bgColor="rgba(0,0,0,0)" readonly data-width="80" data-height="80" data-step='0.1' data-max='100' data-skin="ring">
+		</div>
+		<div style="position:absolute;left:100px;top:20px">
+			<input class="dial acc sita" data-fgColor="#00ffff" data-thickness=".5" data-displayInput=false data-bgColor="rgba(0,0,0,0)" readonly data-width="80" data-height="80" data-step='0.001' data-cursor=true data-rotation=anticlockwise data-angleOffset='0' data-angleArc='180' data-max='1.57' data-min='-1.57'>
+		</div>	
+		<div style="position:absolute;left:100px;top:20px">
+			<input class="dial acc phai" data-fgColor="#ff00ff" data-thickness=".2" data-displayInput=false data-bgColor="rgba(0,0,0,0)" readonly data-width="80" data-height="80" data-step='0.001' data-cursor=true data-rotation=anticlockwise data-angleOffset='90' data-max='6.283'>
+		</div>	
+			
+		<!-- -------------------------------------------------------------------------- -->
+		<div style="position:absolute;left:190px;top:0px;">Vel</div>
+		<div style="position:absolute;left:190px;top:20px">
+			<input class="dial vel leng" data-fgColor="#ffffff" data-thickness=".0" data-bgColor="rgba(0,0,0,0)" readonly data-width="80" data-height="80" data-step='0.1' data-max='999' data-skin="ring">
+		</div>
+		<div style="position:absolute;left:190px;top:20px">
+			<input class="dial vel sita" data-fgColor="#00ffff" data-thickness=".5" data-displayInput=false data-bgColor="rgba(0,0,0,0)" readonly data-width="80" data-height="80" data-step='0.001' data-cursor=true data-rotation=anticlockwise data-angleOffset='0' data-angleArc='180' data-max='1.57' data-min='-1.57'>
+		</div>	
+		<div style="position:absolute;left:190px;top:20px">
+			<input class="dial vel phai" data-fgColor="#ff00ff" data-thickness=".2" data-displayInput=false data-bgColor="rgba(0,0,0,0)" readonly data-width="80" data-height="80" data-step='0.001' data-cursor=true data-rotation=anticlockwise data-angleOffset='90' data-max='6.283'>
+		</div>	
+		<!-- -------------------------------------------------------------------------- -->
+		<div style="position:absolute;left:280px;top:0px;">Dis</div>
+		<div style="position:absolute;left:280px;top:20px">
+			<input class="dial dis leng" data-fgColor="#ffffff" data-thickness=".0" data-bgColor="rgba(0,0,0,0)" readonly data-width="80" data-height="80" data-step='0.1' data-max='100' data-skin="ring">
+		</div>
+		<div style="position:absolute;left:280px;top:20px">
+			<input class="dial dis sita" data-fgColor="#00ffff" data-thickness=".5" data-displayInput=false data-bgColor="rgba(0,0,0,0)" readonly data-width="80" data-height="80" data-step='0.001' data-cursor=true data-rotation=anticlockwise data-angleOffset='0' data-angleArc='180' data-max='1.57' data-min='-1.57'>
+		</div>	
+		<div style="position:absolute;left:280px;top:20px">
+			<input class="dial dis radi" data-fgColor="#007700" data-thickness=".4" data-displayInput=false data-bgColor="rgba(0,0,0,0)" readonly data-width="80" data-height="80" data-step='0.001' data-angleOffset='180' data-angleArc='180' data-max='50'>
+		</div>
+		<div style="position:absolute;left:280px;top:20px">
+			<input class="dial dis phai" data-fgColor="#ff00ff" data-thickness=".2" data-displayInput=false data-bgColor="rgba(0,0,0,0)" readonly data-width="80" data-height="80" data-step='0.001' data-cursor=true data-rotation=anticlockwise data-angleOffset='90' data-max='6.283'>
+		</div>
+		<!-- -------------------------------------------------------------------------- -->
+		<div style="position:absolute;left:370px;top:0px;">Rot</div>
+		<div style="position:absolute;left:370px;top:20px">
+		
+			<input class="dial" data-fgColor="#ffffff" data-thickness=".0" data-displayInput=false data-bgColor="rgba(0,0,0,0)" readonly data-width="80" data-height="80" data-step='0.1' data-max='100' data-skin="ring">
+		
+		</div>
+		<div style="position:absolute;left:370px;top:20px">	
+			<input class="dial rot z" data-fgColor="#00ffff" data-thickness=".6" data-displayInput=false data-bgColor="rgba(0,0,0,0)" readonly data-width="80" data-height="80" data-step='0.001' data-cursor=true data-rotation=anticlockwise data-angleOffset='90' data-max='3.1416' data-min='-3.1416'>
+		</div>
+		<div style="position:absolute;left:370px;top:20px">
+			<input class="dial rot y" data-fgColor="#ffff00" data-thickness=".4" data-displayInput=false data-bgColor="rgba(0,0,0,0)" readonly data-width="80" data-height="80" data-step='0.001' data-cursor=true data-rotation=anticlockwise data-angleOffset='90' data-max='3.1416' data-min='-3.1416'>
+		</div>
+		<div style="position:absolute;left:370px;top:20px">
+			<input class="dial rot x" data-fgColor="#ff00ff" data-thickness=".2" data-displayInput=false data-bgColor="rgba(0,0,0,0)" readonly data-width="80" data-height="80" data-step='0.001' data-cursor=true data-rotation=anticlockwise data-angleOffset='90' data-max='3.1416' data-min='-3.1416'>
+		</div>
+	</div>
+*/</script>
+	<div id='assistInfo'></div>
+
 	<div id='selectCraft'>
-		<button id='kernel'>Model-001 Kernel</button><br>
-		<button id='quad'>Model-002 Quad</button><br>
-		<button id='fighter'>Model-003 Fighter</button><br>
-		<button id='upload'>upload ...</button>
+		<button id='kernel'>Kernel</button><br>
+		<button id='quad'>Quad</button><br>
+		<button id='fighter'>Fighter</button><br>
+		<button id='missile'>Missile</button><br>
 	</div>	
 
 	<div id='selectRunway'>
 		<button id='straight'>advancing</button><br>
 		<button id='lightning'>lightning</button><br>
-		<button id='swinging'>swinging</button><br>	
 		<button id='sawtooth'>sawtooth</button><br>
+		<button id='swinging'>swinging</button><br>	
 	</div>
-</center>
+<!-- ------------------------------------------------------------------- -->
+
+  
+
+	<xml id="toolbox" style="display: none">
+		<category name="Quota : 5"></category>
+		<sep></sep>
+		<category name="Logic">
+			<category name="If">
+				<block type="controls_if"></block>
+				<block type="controls_if">
+					<mutation else="1"></mutation>
+				</block>
+				<block type="controls_if">
+					<mutation elseif="1" else="1"></mutation>
+				</block>
+			</category>
+			<category name="Boolean">
+				<block type="logic_compare"></block>
+				<block type="logic_operation"></block>
+				<block type="logic_negate"></block>
+				<block type="logic_boolean"></block>
+				<block type="logic_null"></block>
+				<block type="logic_ternary"></block>
+			</category>
+		</category>
+		<category name="Math">
+			<block type="math_number"></block>
+			<block type="math_arithmetic"></block>
+			<block type="math_single"></block>
+		</category>	
+		<category name="Text">
+			<block type="text"></block>
+			<block type="text_join"></block>
+		</category>	
+		<category name="Variables" custom="VARIABLE"></category>
+    	<category name="Functions" custom="PROCEDURE"></category>
+		<category name="CodeCraft">
+			<block type="craft_status"></block>
+			<block type="check_point"></block>
+			<block type="progress"></block>
+			<block type="time"></block>
+			<block type="echo"></block>
+			<block type="keypress"></block>
+			<block type="engine"></block>
+		</category>
+	</xml>
 <script>
+	var workspace = Blockly.inject('blocklyDiv',
+	{	
+		toolbox: document.getElementById('toolbox'),
+		zoom:{controls: true,wheel: true,startScale: 0.7},
+	});
+
+  	var defaultXml ='<xml><block type="cpu_run"></block></xml>'
+  	defaultXml ='<xml ><block type="cpu_run"  deletable="false" x="-193" y="63"><statement name="cpu_code"><block type="echo" ><value name="string"><block type="text_join" ><mutation items="8"></mutation><value name="ADD0"><block type="text" ><field name="TEXT">Manual driving mode&lt;br&gt;</field></block></value><value name="ADD1"><block type="text" ><field name="TEXT">[W] to force forward &lt;br&gt;</field></block></value><value name="ADD2"><block type="text" ><field name="TEXT">[S] to force backward &lt;br&gt;</field></block></value><value name="ADD3"><block type="text" ><field name="TEXT">[A] to force left&lt;br&gt;</field></block></value><value name="ADD4"><block type="text" ><field name="TEXT">[D] to force right&lt;br&gt;</field></block></value><value name="ADD5"><block type="text" ><field name="TEXT">[R] to force rise&lt;br&gt;</field></block></value><value name="ADD6"><block type="text" ><field name="TEXT">[F] to force fall&lt;br&gt;</field></block></value><value name="ADD7"><block type="text" ><field name="TEXT">[Space] Autopilot &lt;br&gt;</field></block></value></block></value><next><block type="engine" ><field name="name">up</field><field name="fire">FALSE</field><next><block type="engine" ><field name="name">down</field><field name="fire">FALSE</field><next><block type="engine" ><field name="name">left</field><field name="fire">FALSE</field><next><block type="engine" ><field name="name">right</field><field name="fire">FALSE</field><next><block type="engine" ><field name="name">front</field><field name="fire">FALSE</field><next><block type="engine" ><field name="name">back</field><field name="fire">FALSE</field><next><block type="controls_if" ><value name="IF0"><block type="keypress" ><field name="key">A</field></block></value><statement name="DO0"><block type="engine" ><field name="name">left</field><field name="fire">TRUE</field></block></statement><next><block type="controls_if" ><value name="IF0"><block type="keypress" ><field name="key">D</field></block></value><statement name="DO0"><block type="engine" ><field name="name">right</field><field name="fire">TRUE</field></block></statement><next><block type="controls_if" ><value name="IF0"><block type="keypress" ><field name="key">W</field></block></value><statement name="DO0"><block type="engine" ><field name="name">front</field><field name="fire">TRUE</field></block></statement><next><block type="controls_if" ><value name="IF0"><block type="keypress" ><field name="key">S</field></block></value><statement name="DO0"><block type="engine" ><field name="name">back</field><field name="fire">TRUE</field></block></statement><next><block type="controls_if" ><value name="IF0"><block type="keypress" ><field name="key">R</field></block></value><statement name="DO0"><block type="engine" ><field name="name">up</field><field name="fire">TRUE</field></block></statement><next><block type="controls_if" ><value name="IF0"><block type="keypress" ><field name="key">F</field></block></value><statement name="DO0"><block type="engine" ><field name="name">down</field><field name="fire">TRUE</field></block></statement><next><block type="controls_if" ><value name="IF0"><block type="keypress" ><field name="key"> </field></block></value><statement name="DO0"><block type="echo" ><value name="string"><block type="text" ><field name="TEXT">Autopilot Mode</field></block></value><next><block type="variables_set" ><field name="VAR">ex</field><value name="VALUE"><block type="math_arithmetic" ><field name="OP">MINUS</field><value name="A"><block type="check_point" ><field name="component">x</field><value name="nth"><block type="progress" ></block></value></block></value><value name="B"><block type="craft_status" ><field name="property">position</field><field name="component">x</field></block></value></block></value><next><block type="variables_set" ><field name="VAR">ey</field><value name="VALUE"><block type="math_arithmetic" ><field name="OP">MINUS</field><value name="A"><block type="check_point" ><field name="component">y</field><value name="nth"><block type="progress" ></block></value></block></value><value name="B"><block type="craft_status" ><field name="property">position</field><field name="component">y</field></block></value></block></value><next><block type="variables_set" ><field name="VAR">ez</field><value name="VALUE"><block type="math_arithmetic" ><field name="OP">MINUS</field><value name="A"><block type="check_point" ><field name="component">z</field><value name="nth"><block type="progress" ></block></value></block></value><value name="B"><block type="craft_status" ><field name="property">position</field><field name="component">z</field></block></value></block></value><next><block type="variables_set" ><field name="VAR">rate</field><value name="VALUE"><block type="math_number" ><field name="NUM">0.5</field></block></value><next><block type="controls_if" ><mutation elseif="1"></mutation><value name="IF0"><block type="logic_compare" ><field name="OP">GT</field><value name="A"><block type="craft_status" ><field name="property">velocity</field><field name="component">x</field></block></value><value name="B"><block type="math_arithmetic" ><field name="OP">ADD</field><value name="A"><block type="math_arithmetic" ><field name="OP">MULTIPLY</field><value name="A"><block type="variables_get" ><field name="VAR">rate</field></block></value><value name="B"><block type="variables_get" ><field name="VAR">ex</field></block></value></block></value><value name="B"><block type="math_number" ><field name="NUM">1</field></block></value></block></value></block></value><statement name="DO0"><block type="engine" ><field name="name">right</field><field name="fire">TRUE</field></block></statement><value name="IF1"><block type="logic_compare" ><field name="OP">LT</field><value name="A"><block type="craft_status" ><field name="property">velocity</field><field name="component">x</field></block></value><value name="B"><block type="math_arithmetic" ><field name="OP">MINUS</field><value name="A"><block type="math_arithmetic" ><field name="OP">MULTIPLY</field><value name="A"><block type="variables_get" ><field name="VAR">rate</field></block></value><value name="B"><block type="variables_get" ><field name="VAR">ex</field></block></value></block></value><value name="B"><block type="math_number" ><field name="NUM">1</field></block></value></block></value></block></value><statement name="DO1"><block type="engine" ><field name="name">left</field><field name="fire">TRUE</field></block></statement><next><block type="controls_if" ><mutation elseif="1"></mutation><value name="IF0"><block type="logic_compare" ><field name="OP">GT</field><value name="A"><block type="craft_status" ><field name="property">velocity</field><field name="component">y</field></block></value><value name="B"><block type="math_arithmetic" ><field name="OP">ADD</field><value name="A"><block type="math_arithmetic" ><field name="OP">MULTIPLY</field><value name="A"><block type="variables_get" ><field name="VAR">rate</field></block></value><value name="B"><block type="variables_get" ><field name="VAR">ey</field></block></value></block></value><value name="B"><block type="math_number" ><field name="NUM">1</field></block></value></block></value></block></value><statement name="DO0"><block type="engine" ><field name="name">down</field><field name="fire">TRUE</field></block></statement><value name="IF1"><block type="logic_compare" ><field name="OP">LT</field><value name="A"><block type="craft_status" ><field name="property">velocity</field><field name="component">y</field></block></value><value name="B"><block type="math_arithmetic" ><field name="OP">MINUS</field><value name="A"><block type="math_arithmetic" ><field name="OP">MULTIPLY</field><value name="A"><block type="variables_get" ><field name="VAR">rate</field></block></value><value name="B"><block type="variables_get" ><field name="VAR">ey</field></block></value></block></value><value name="B"><block type="math_number" ><field name="NUM">1</field></block></value></block></value></block></value><statement name="DO1"><block type="engine" ><field name="name">up</field><field name="fire">TRUE</field></block></statement><next><block type="controls_if" ><mutation elseif="1"></mutation><value name="IF0"><block type="logic_compare" ><field name="OP">GT</field><value name="A"><block type="craft_status" ><field name="property">velocity</field><field name="component">z</field></block></value><value name="B"><block type="math_arithmetic" ><field name="OP">ADD</field><value name="A"><block type="math_arithmetic" ><field name="OP">MULTIPLY</field><value name="A"><block type="variables_get" ><field name="VAR">rate</field></block></value><value name="B"><block type="variables_get" ><field name="VAR">ez</field></block></value></block></value><value name="B"><block type="math_number" ><field name="NUM">1</field></block></value></block></value></block></value><statement name="DO0"><block type="engine" ><field name="name">back</field><field name="fire">TRUE</field></block></statement><value name="IF1"><block type="logic_compare" ><field name="OP">LT</field><value name="A"><block type="craft_status" ><field name="property">velocity</field><field name="component">z</field></block></value><value name="B"><block type="math_arithmetic" ><field name="OP">MINUS</field><value name="A"><block type="math_arithmetic" ><field name="OP">MULTIPLY</field><value name="A"><block type="variables_get" ><field name="VAR">rate</field></block></value><value name="B"><block type="variables_get" ><field name="VAR">ez</field></block></value></block></value><value name="B"><block type="math_number" ><field name="NUM">1</field></block></value></block></value></block></value><statement name="DO1"><block type="engine" ><field name="name">front</field><field name="fire">TRUE</field></block></statement></block></next></block></next></block></next></block></next></block></next></block></next></block></next></block></statement></block></next></block></next></block></next></block></next></block></next></block></next></block></next></block></next></block></next></block></next></block></next></block></next></block></next></block></statement></block></xml>'
+
+	var cleanId=function(text1){
+		text1=text1.split('xmlns="http://www.w3.org/1999/xhtml"')[0]+text1.split('xmlns="http://www.w3.org/1999/xhtml"')[1]
+		var len1=text1.split('id').length
+		var text2=text1.split('id')[0]
+		for(i=1;i<len1;i++){
+			var len2=text1.split('id')[i].length
+			// console.log(text1.split('id')[i].slice(23,len2))
+			text2+=text1.split('id')[i].slice(23,len2)
+		}
+		return text2
+	}
+
+	var xml = Blockly.Xml.textToDom(defaultXml);
+    Blockly.Xml.domToWorkspace(xml,workspace);
+
+	// var cpu_run=function(){}
+	var blocklyCode=
+	"var a=0;"+
+	"var cpu_run=function(){"+
+		"craft.switchEngine('left',true);"+
+	"};"
+	blocklyCode=Blockly.JavaScript.workspaceToCode(workspace);
+
+
+	function triggerBlockly(){
+		eval(blocklyCode)
+		return {cpu_run:cpu_run}
+	}
+
+	var editor = ace.edit("aceEditor");
+	editor.setTheme("ace/theme/twilight");
+	editor.getSession().setMode("ace/mode/javascript");	
+	editor.setReadOnly(true)
+	
+	workspace.addChangeListener(function(){
+		blocklyCode=Blockly.JavaScript.workspaceToCode(workspace);
+		xml=Blockly.Xml.workspaceToDom(workspace)
+		var text = Blockly.Xml.domToText(xml);
+		editor.setValue(cleanId(text))
+		editor.setValue(blocklyCode)
+		editor.setValue(cleanId(text)+'\n\n'+blocklyCode)
+	})
+
+
 	$("#menu").dialog({
 		title:'Main Menu',
-		position:{at:"center center"},
-		width:150,height:230,
+		position:{at:"right top"},
+		width:200,height:230,
 		resizable:false,
-		draggable:false,
+		// draggable:false,
 		open: function(){
 			$(".ui-dialog-titlebar-close").hide();
 		},
-		show:{effect: "clip",duration: 200},
-		hide:{effect: "clip",duration: 200}
+		dragStart: function(event,ui){
+			$(this).parent().css("border","1px solid #2222ff")
+		},
+		dragStop: function(event,ui){
+			$(this).parent().css("border","1px solid rgba(0,0,0,0)")
+			$(this).parent().css("border-left","1px solid #2222ff")
+		}
+		// show:{effect: "blind",duration: 0},
+		// hide:{effect: "blind",duration: 0}
 	});
 
 		$("#play").button().click(function(){
 			$("#menu").dialog('close')
-			$("#motionStatus").dialog('open')
+			$("#dashboard").dialog('open')
+			$("#assistInfo").dialog('open')
 			timer.start()
 
-			renderer.domElement.requestPointerLock = 
-				renderer.domElement.requestPointerLock ||
-				renderer.domElement.mozRequestPointerLock ||
-				renderer.domElement.webkitRequestPointerLock;
-			renderer.domElement.requestPointerLock()
-			renderer.domElement.addEventListener('mousemove',mousemoveReact);
+			// viewer.pointerLock()
+			// viewer.renderer.domElement.addEventListener('mousemove',viewer.mouseReact);
 			// document.addEventListener('keydown', ctrlKernel, false );
 			// document.addEventListener('keyup', ctrlKernel, false );
 			// document.addEventListener('keydown', ctrlQuad, false );	
@@ -79,120 +265,170 @@
 			// document.addEventListener('keydown', ctrlFight);
 			// document.addEventListener('keyup', ctrlFight);	
 			// setInterval('render()',60)
-			runway.resetColor(1)
-			setInterval('flash()',10)		
+			runway.resetColor()
+			blocklyCode=Blockly.JavaScript.workspaceToCode(workspace);	
+
+			runFlash=setInterval('flash()',10)		
 		});
 		function escPress(event){
 			switch(event.keyCode){
 			case 27:
 			// location.reload()
-			timer.stop()
-
-			console.log(timer.autoStart)
-			craft.accelera.set(0,0,0)
-			craft.velocity.set(0,0,0)
-			// craft.position.set(0,20,-100)
-			craft.position.copy(runway.checkPoint[0].position)
-			craft.rotaAcce.set(0,0,0)
-			craft.rotaVelo.set(0,0,0)
-			craft.rotation.set(0,0,0)
+			timer=new THREE.Clock(false)
+			craft.reset()
 			progress=0
 			runway.resetColor()
-			radius=200
-			thita=0.5,phai=-1.55;
+			clearInterval(runFlash);
+			// viewer.pointerLock('exit')
+			viewer.rebuild()
+			// 		viewer.remove(viewer.camera);
+			// 		viewer.camera=new THREE.PerspectiveCamera(40,windowX/windowY,5,10000);
+			// 		viewer.camera.lookAt(new THREE.Vector3(0,0,1))
+			// 		viewer.add(viewer.camera);
+			// viewer.renderer.setSize(windowX, windowY );		
+			viewer.reset()
 			// renderer.domElement.removeEventListener('mousemove', mousemoveReact);
 			// document.removeEventListener('keydown', ctrlFight);
 			// document.removeEventListener('keyup', ctrlFight);
 			$("#menu").dialog('open');
+			$('#dashboard').dialog('close')
+			$('#assistInfo').dialog('close')
 			$('#selectCraft').dialog('close')
-			$('#motionStatus').dialog('close')
+			$('#selectRunway').dialog('close')
+
+			$('#blocklyDiv').css("left","-60%")
+
+			// camera = new THREE.PerspectiveCamera(40,windowX/windowY,5,10000);
+			// viewer.renderer.setSize(windowX, windowY );
+
 			break;
 			}
 		}
 
 		$("#code").button().click(function(){
-
-
+			$("#menu").dialog('close')
+			// $('#blockly').dialog('open')
+			// viewer.camera = new THREE.PerspectiveCamera(40,0.382*windowX/windowY,5,10000);
+			viewer.rebuild(0)
+			$('#blocklyDiv').css("left","0%")
+			// 		viewer.remove(viewer.camera);
+			// 		viewer.camera=new THREE.PerspectiveCamera(40,0.382*windowX/windowY,5,10000);
+			// 		viewer.camera.lookAt(new THREE.Vector3(0,0,1))
+			// 		viewer.add(viewer.camera);
+			// viewer.renderer.setSize(0.382*windowX, windowY );
+			// viewer.distance=30
 		});
 
 		$("#craft").button().click(function(){
 			$("#menu").dialog('close')
 			$('#selectCraft').dialog('open')
-			radius=50
+			viewer.distance=50
 		});
 
 		$("#runway").button().button().click(function(){
 			$("#menu").dialog('close')
 			$('#selectRunway').dialog('open')
-			radius=500
+			viewer.distance=500
 		});
-		$("#assemb").button()
-		$("#paint").button()
+		$("#github").button()
 
 		
 
-	$('#motionStatus').dialog({
-		title:'Motion Status',
+	$('#dashboard').dialog({
+		title:'Dashboard',
 		position:{at:"left bottom"},
-		width:300,height:180,
+		width:450,height:140,
 		resizable:false,
 		draggable:false,
 		open: function(){
 			$(".ui-dialog-titlebar-close").hide();
 		},
-		show:{effect: "clip",duration: 200},
-		hide:{effect: "clip",duration: 200}
+		// show:{effect: "blind",duration: 0},
+		// hide:{effect: "blind",duration: 0}
 	})
-	$('#motionStatus').dialog('close')
+	$('#dashboard').dialog('close')
+	$(".dial").knob({ 
+        draw : function () {
+            if(this.$.data('skin') == 'ring') {
+                this.g.lineWidth = 0.2;
+                this.g.beginPath();
+                this.g.strokeStyle = this.o.fgColor;
+                this.g.arc( this.xy, this.xy, this.radius, 0, 2 * Math.PI, false);
+                this.g.stroke();
+                return false;
+            }
+        }
+    });
+	// $(".dec").knob()
+    // $(".dec").knob({draw:function(){this.o.rotation='anticlockwise';console.log(this.o.rotation)}})
+
+    $('#assistInfo').dialog({
+		title:'Assist Information',
+		position:{my:"right bottom",at:"right bottom"},
+		width:300,height:200,
+		resizable:false,
+		draggable:false,
+		open: function(){
+			$(".ui-dialog-titlebar-close").hide();
+		},
+		// show:{effect: "blind",duration: 0},
+		// hide:{effect: "blind",duration: 0}
+	})
+	$('#assistInfo').dialog('close')
 
 	$('#selectCraft').dialog({
 		title:'Select Craft',
-		position:{at:"right center"},
-		width:200,height:400,
+		position:{at:"right top"},
+		width:200,height:230,
 		autoOpen:false,
 		resizable:false,
 		draggable:false,
 		open: function(){
 			$(".ui-dialog-titlebar-close").hide();
 		},
-		show:{effect: "clip",duration: 200},
-		hide:{effect: "clip",duration: 200},
+		// show:{effect: "blind",duration: 0},
+		// hide:{effect: "blind",duration: 0},
 		buttons: {
-			'Pick Out': function() {
+			'OK': function() {
 				$("#menu").dialog('open')
 				$('#selectCraft').dialog('close')
-				radius=200
+				viewer.reset()
 			}
-	  	}
+			}
 	})
 	$('#selectCraft').dialog('close')
 
 		$("#kernel").button().click(function(){
-			scene.remove(craft)
 			buildCraft(kernel)
-			scene.add(craft)
-			craft.position.copy(runway.checkPoint[0].position)
+			craft.reset()
+			// craft.plotPillar()
 			removeAllCtrl()
 			document.addEventListener('keydown', ctrlKernel, false );
 			document.addEventListener('keyup', ctrlKernel, false );
 		})
 		$("#quad").button().click(function(){
-			scene.remove(craft)
 			buildCraft(quadcopter)
-			scene.add(craft)
-			craft.position.copy(runway.checkPoint[0].position)
+			craft.reset()
+			// craft.plotPillar()
 			removeAllCtrl()
 			document.addEventListener('keydown', ctrlQuad, false );	
 			document.addEventListener('keyup', ctrlQuad, false );
 		})
 		$("#fighter").button().click(function(){
-			scene.remove(craft)
 			buildCraft(fighter)
-			scene.add(craft)
-			craft.position.copy(runway.checkPoint[0].position)
+			craft.reset()
+			// craft.plotPillar()
 			removeAllCtrl()
 			document.addEventListener('keydown', ctrlFight, false );
 			document.addEventListener('keyup', ctrlFight, false );
+		})
+		$("#missile").button().click(function(){
+			buildCraft(missile)
+			craft.reset()
+			// craft.plotPillar()
+			removeAllCtrl()
+			document.addEventListener('keydown', ctrlMissile, false );
+			document.addEventListener('keyup', ctrlMissile, false );
 		})
 		function removeAllCtrl(){
 			document.removeEventListener('keydown',ctrlKernel);
@@ -206,83 +442,92 @@
 
 	$('#selectRunway').dialog({
 		title:'Select Runway',
-		position:{at:"right center"},
-		width:200,height:400,
+		position:{at:"right top"},
+		width:200,height:230,
 		autoOpen:false,
 		resizable:false,
 		draggable:false,
 		open: function(){
 			$(".ui-dialog-titlebar-close").hide();
 		},
-		show:{effect: "clip",duration: 200},
-		hide:{effect: "clip",duration: 200},
+		// show:{effect: "blind",duration: 0},
+		// hide:{effect: "blind",duration: 0},
 		buttons: {
-			'Pick Out': function() {
+			'OK': function() {
 				$("#menu").dialog('open')
 				$('#selectRunway').dialog('close')
-				radius=200
+				viewer.reset()
 			}
-	  	}
+			}
 	})
 	$('#selectRunway').dialog('close')	
 
 		$("#straight").button().click(function(){
-			scene.remove(runway)
 			buildRunway(straight)
-			scene.add(runway)
 		})
 		$("#lightning").button().click(function(){
-			scene.remove(runway)
 			buildRunway(lightning)
-			scene.add(runway)
 		})
 		$("#swinging").button().click(function(){
-			scene.remove(runway)
 			buildRunway(swinging)
-			scene.add(runway)
 		})
 		$("#sawtooth").button().click(function(){
-			scene.remove(runway)
 			buildRunway(sawtooth)
-			scene.add(runway)
 		})
-
 
 	// $('#tabs').tabs();
 
-	var CoC={}
-	var camera, scene, renderer;
-	var windowX = window.innerWidth
-	   ,windowY = window.innerHeight;
+	// var CoC={}
+	var space, renderer,viewer;
+	var windowX = window.innerWidth,
+		windowY = window.innerHeight;
 	var craft,runway,auxPlane,aimLine,background,vArrow;
-	var fieldCenter
-	var radius=200,thita=0.5,phai=-1.55;
+	var craft=new THREE.Object3D 
+	craft.pillar=new THREE.Object3D
 	var mouseDx=0,mouseDy=0,mouseDz=0;
 	var timer=new THREE.Clock(false),tt,dt
 
-	var s3d2=Math.sqrt(3)/2,s2d2=Math.sqrt(2)/2
+	// var s3d2=Math.sqrt(3)/2,s2d2=Math.sqrt(2)/2
 
-	var progress=0
+	var progress=0,runFlash
+
+	ccKeybroad=new CC().keyBroad()
+	// console.log(ccKeybroad.react)
+	// var viewer=new THREE.Object3D
 
 	// init(); to the end 
 	function init() {
-		camera = new THREE.PerspectiveCamera(40,windowX/windowY,5,10000);
-		// camera.position.set(500,100,-100)
 
-		scene = new THREE.Scene();
-		scene.fog = new THREE.FogExp2(0x000000,0.001);
-		// scene.fog = new THREE.Fog( 0x000000, 3500, 15000 );
-		// scene.fog.color.setHSL( 0.51, 0.4, 0.01 );
+		space = new THREE.Scene();
+		space.fog = new THREE.FogExp2(0x000000,0.001);
 
-		renderer = new THREE.WebGLRenderer( { antialias: true } );
-		renderer.setSize( windowX, windowY );
-		renderer.setClearColor ('#000000',1)
-		document.body.appendChild( renderer.domElement );
+		// renderer = new THREE.WebGLRenderer( { antialias: true } );
+		// // renderer = new THREE.WebGLRenderer();
+		// renderer.setSize(windowX, windowY );
+		// renderer.setClearColor ('#000000',1)
+		// document.body.appendChild( renderer.domElement );
 
-		// Default Craft
+		// renderer.domElement.style.float='right'
+		// renderer.domElement.style.position='fixed'
+		// renderer.domElement.style.top=0
+		// renderer.domElement.style.right=0
+
+		buildViewer()
+		buildBackground()
 		buildCraft(kernel)	
 		// buildCraft(quadcopter)	
 		// buildCraft(fighter)
+		buildRunway(straight)
+		// buildRunway(lightning)
+		craft.reset()
+
+		buildAuxPlane(-1,1,-1,5)
+
+		document.addEventListener('keydown',escPress);
+		document.addEventListener('keyup',escPress);
+
+		document.addEventListener('keydown', ccKeybroad.react , false );
+		document.addEventListener('keyup', ccKeybroad.react , false );
 
 		document.addEventListener('keydown', ctrlKernel, false );
 		document.addEventListener('keyup', ctrlKernel, false );
@@ -291,44 +536,195 @@
 		// document.addEventListener('keydown', ctrlFight);
 		// document.addEventListener('keyup', ctrlFight);
 		//
-			
 
-		buildRunway(lightning)
-		buildRunway(straight)
-		scene.add(runway)
-		// console.log(runway.checkPoint[0].visible)
+		// renderer.domElement.addEventListener('mousemove', mousemoveReact);
+		// renderer.domElement.addEventListener("mousewheel",mousewheelHandler);
+		viewer.renderer.domElement.addEventListener('mousemove',viewer.mouseReact);
+		viewer.renderer.domElement.addEventListener("mousewheel",viewer.wheelReact);
 
-		scene.add(craft)
-		craft.position.copy(runway.checkPoint[0].position)
-
-		setAuxPlane(-1,1,-1,10)
-		scene.add(auxPlane)
-
-		setBackground()
-		scene.add(background)
-
-		renderer.domElement.addEventListener('mousemove', mousemoveReact);
-		renderer.domElement.addEventListener("mousewheel",mousewheelHandler);
-
-		document.addEventListener('keydown',escPress);
-		document.addEventListener('keyup',escPress);
+		
 
 
 		setInterval('render()',60)
+		// setInterval('eval(blocklyCode)',1000)
+
+
+		// var geometry = new THREE.SphereGeometry(0.5, 16,16 );
+		// var material = new THREE.MeshLambertMaterial( {
+  //         color: 0xffffff,
+  //         // specular: 0xff0000, 
+  //         emissive: 0x000000,
+  //         // alphaMap:
+  //       } )
+		// var sphere = new THREE.Mesh( geometry, material );
+		// sphere.position.set( 0, 25,-100);
+		// space.add( sphere );
+		// sphere.castShadow = true;
+		// sphere.receiveShadow = true;
+		// var sphere = new THREE.Mesh( geometry, material );
+		// sphere.position.set( 1, 25,-100);
+		// space.add( sphere );
+		// sphere.castShadow = true;
+		// sphere.receiveShadow =true;
+		// var sphere = new THREE.Mesh( geometry, material );
+		// sphere.position.set(-1, 25,-100);
+		// space.add( sphere );
+		// sphere.castShadow = true;
+		// sphere.receiveShadow = true;
+
+
+		var light1=new THREE.PointLight( 0xff00ff,2, 2,1 );
+		light1.position.set(-2, 25,-100);
+		// light1.castShadow = true;
+		space.add( light1);
+
+		// var light2=new THREE.PointLight( 0xff00ff, 1, 100,1 );
+		var light2 = new THREE.DirectionalLight( 0xffffff, 0.5);
+		// light2.castShadow = true; 
+		light2.position.set(1, 0,0);
+		console.log(light2)
+		// space.add( light2);
+
+		// light3=new THREE.PointLight( 0xffffff, 0.2, 500, 1);
+		// light3.position.set(10, 25,-100);
+		// space.add( light3);
+
+		// light4=new THREE.SpotLight( 0xffffff,0.5,500)
+		// // light4.position.set(0, 27,-100);
+		// light4.position.set(0, 25,-102);
+
+		// light4.target.position.set(0, 25,-100)
+		// space.add(light4)
+		// space.add(light4.target)
+
+		// console.log(light4.target)
+		craft1=new CoC.Craft()
+		console.log(craft1)
+		// craft1.add(craft1.model)
+		var reader = new FileReader();
+		reader.readAsDataURL('./data.json')
+		console.log(reader)
 	}
 
-	function setBackground(){
+	function buildViewer(){
+		viewer=new THREE.Object3D;
+		space.add(viewer)
+
+		viewer.renderer = new THREE.WebGLRenderer( { antialias: true } );
+		viewer.renderer.setSize(windowX, windowY );
+		viewer.renderer.setClearColor ('#000000',1)
+		document.body.appendChild( viewer.renderer.domElement );
+
+		viewer.renderer.domElement.style.float='right'
+		viewer.renderer.domElement.style.position='fixed'
+		viewer.renderer.domElement.style.top=0
+		viewer.renderer.domElement.style.right="0"
+		viewer.renderer.domElement.style.zIndex="10"
+
+		viewer.camera=new THREE.PerspectiveCamera(40,windowX/windowY,5,10000);
+		viewer.camera.lookAt(new THREE.Vector3(0,0,1))
+		viewer.add(viewer.camera);
+
+		viewer.spotlight=new THREE.SpotLight( 0xffffff,0.4,500);
+		space.add(viewer.spotlight);
+		space.add(viewer.spotlight.target)
+
+		viewer.distance=200;
+		viewer.thita=0.5;
+		viewer.phai=-1.55;
+
+		viewer.follow=function(){
+			var d=viewer.distance,
+				t=viewer.thita,
+				p=viewer.phai
+			viewer.position.x=craft.position.x+d*Math.cos(p)*Math.cos(t)
+			viewer.position.z=craft.position.z+d*Math.sin(p)*Math.cos(t)
+			viewer.position.y=craft.position.y+d*Math.sin(t)
+			viewer.lookAt(craft.position)
+			viewer.spotlight.position.copy(viewer.position)
+			viewer.spotlight.target.position.copy(craft.position)
+		}
+
+		viewer.reset=function(){
+			viewer.distance=200;
+			viewer.thita=0.5;
+			viewer.phai=-1.55;
+		}
+
+		viewer.mouseReact=function(event){
+			// console.log(event)
+			if(event.which==1){
+
+				viewer.renderer.domElement.style.cursor = "none"
+				mouseDx=event.movementX || event.mozMovementX || event.webkitMovementX || 0;
+				mouseDy=event.movementY || event.mozMovementY || event.webkitMovementY || 0;
+				viewer.phai+= mouseDx*0.002
+				viewer.thita+=mouseDy*0.002
+				if(viewer.thita> Math.PI*0.49){viewer.thita= Math.PI*0.49}
+				if(viewer.thita<-Math.PI*0.49){viewer.thita=-Math.PI*0.49}
+			}else{	 
+				viewer.renderer.domElement.style.cursor = "crosshair"
+			}
+		}
+
+		viewer.wheelReact=function(event){
+			// console.log(event.deltaY)
+			mouseDz=event.deltaY
+				// console.log(distance)
+			viewer.distance+=mouseDz/20	
+			if(viewer.distance<100 || viewer.distance>300){
+				viewer.distance-=mouseDz/20
+			}
+		}
+
+		viewer.rebuild=function(rate){
+			if(rate==null){rate=1}
+			viewer.remove(viewer.camera);
+			viewer.camera=new THREE.PerspectiveCamera(40,rate*windowX/windowY,5,10000);
+			viewer.camera.lookAt(new THREE.Vector3(0,0,1))
+			viewer.add(viewer.camera);
+			viewer.renderer.setSize(rate*windowX, windowY );
+		}	
+
+		// viewer.pointerLock=function(){
+		// 	viewer.renderer.domElement.requestPointerLock = 
+		// 		viewer.renderer.domElement.requestPointerLock ||
+		// 		viewer.renderer.domElement.mozRequestPointerLock ||
+		// 		viewer.renderer.domElement.webkitRequestPointerLock;
+		// 	viewer.renderer.domElement.requestPointerLock()
+		// }	
+	}
+
+	function buildBackground(){
 		background=new THREE.Object3D
+		var stars,galaxy,sunlight
 		var geometry = new THREE.Geometry();
 		for ( var i = 0; i < 10000; i ++ ) {
 			var vertex = new THREE.Vector3();
 			vertex.x = THREE.Math.randFloatSpread( 2000 );
 			vertex.y = THREE.Math.randFloatSpread( 2000 );
 			vertex.z = THREE.Math.randFloatSpread( 2000 );
-			if(vertex.length()>500){geometry.vertices.push( vertex );}
+			if(vertex.length()>400){geometry.vertices.push( vertex );}
 		}
-		var stars=new THREE.PointCloud(geometry,new THREE.PointCloudMaterial({color:0xffffff}));
+		stars=new THREE.PointCloud(geometry,new THREE.PointCloudMaterial({color:0xffffff}));
 		background.add(stars);
+
+		var geometry = new THREE.Geometry();
+		for ( var i = 0; i < 10000; i ++ ) {
+			var vertex = new THREE.Vector3();
+			vertex.x = THREE.Math.randFloatSpread( 2000 );
+			vertex.y = THREE.Math.randFloatSpread( 150 );
+			vertex.z = THREE.Math.randFloatSpread( 2000 );
+			if(vertex.length()>400){geometry.vertices.push( vertex );}
+		}
+		galaxy=new THREE.PointCloud(geometry,new THREE.PointCloudMaterial({color:0x00ffff}));
+		background.add(galaxy);
+
+		sunlight=new THREE.DirectionalLight( 0xffffff, 0.6);
+		sunlight.position.set(1, 0,0);
+		space.add(sunlight);
+
+		space.add(background);
 	}
 
 	THREE.Vector3.prototype.format=function(){
@@ -338,6 +734,19 @@
 			Math.round(this.z*100)/100
 		]
 	}	
+	THREE.Vector3.prototype.phai=function(){
+		var lenXZ=Math.sqrt(this.x*this.x+this.z*this.z),
+			p=Math.acos(-this.x/lenXZ)
+		if(this.z<0){p=2*Math.PI-p}	
+		return p
+	}
+	THREE.Vector3.prototype.sita=function(){
+		var lenXZ=Math.sqrt(this.x*this.x+this.z*this.z),
+			s=Math.acos(lenXZ/this.length())
+		if(this.y<0){s=-s}		
+		return s
+	}
+
 	THREE.Euler.prototype.format=function(){
 		return [
 			Math.round(this.x*100)/100,
@@ -348,32 +757,71 @@
 	}
 
 	function velocityArrow(){
-		scene.remove(vArrow)
+		space.remove(vArrow)
 
 		var color=new THREE.Color(0x0000ff),head=5
 		if(craft.velocity.length()<25){head=null}
 		vArrow=CoC.Arrow(craft.position,craft.velocity,color,head)
 
-		scene.add(vArrow)
+		space.add(vArrow)
 	}	
 
-	function render(){
-		camera.position.x=craft.position.x+radius*Math.cos(phai)*Math.cos(thita)
-		camera.position.z=craft.position.z+radius*Math.sin(phai)*Math.cos(thita)
-		camera.position.y=craft.position.y+radius*Math.sin(thita)		
-		camera.lookAt( craft.position );
-		background.position.copy(camera.position)
-		plotAimLine()
-		velocityArrow()
-		renderer.render( scene, camera );
-		$('#motionStatus').html('<br>'+
-			'accelera : '+craft.accelera.format()+'<br>'+
-			'velocity : '+craft.velocity.format()+'<br>'+
-			'position : '+craft.position.format()+'<br>'+
-			'rotaAcce : '+craft.rotaAcce.format()+'<br>'+
-			'rotaVelo : '+craft.rotaVelo.format()+'<br>'+
-			'rotation : '+craft.rotation.format()
-		)
+	function render(){		
+		viewer.follow()
+		background.position.copy(viewer.position)
+		if(runway.checkPoint.length>progress){
+			plotAimLine()
+		}else{runway.remove(aimLine)}
+		craft.plotPillar()
+
+		// velocityArrow()
+		viewer.renderer.render(space,viewer.camera);
+		// $('#assistInfo').html(
+		// 	'accelera : '+craft.accelera.format()+'<br>'+
+		// 	'velocity : '+craft.velocity.format()+'<br>'+
+		// 	'position : '+craft.position.format()+'<br>'+
+		// 	'rotaAcce : '+craft.rotaAcce.format()+'<br>'+
+		// 	'rotaVelo : '+craft.rotaVelo.format()+'<br>'+
+		// 	'rotation : '+craft.rotation.format()
+		// )
+		// var $dec = $(".dec"),
+		// 	$sec = $(".sec"),
+		// 	$min = $(".min")
+		// $dec.val(10*tt%10).trigger("change");
+		// $sec.val(Math.floor(tt)%60).trigger("change");
+		// $min.val(Math.floor(tt/60)).trigger("change");
+
+		// var $leng = $(".acc.leng"),
+		// 	$phai = $(".acc.phai"),
+		// 	$sita = $(".acc.sita")
+		// $leng.val(craft.accelera.length()).trigger("change")
+		// $phai.val(craft.accelera.phai()).trigger("change")
+		// $sita.val(craft.accelera.sita()).trigger("change")
+
+
+		// var $leng = $(".vel.leng"),
+		// 	$phai = $(".vel.phai"),
+		// 	$sita = $(".vel.sita")
+		// $leng.val(craft.velocity.length()).trigger("change")
+		// $phai.val(craft.velocity.phai()).trigger("change")
+		// $sita.val(craft.velocity.sita()).trigger("change")
+
+		// var displacement=runway.checkPoint[progress].position.clone().sub(craft.position)
+		// var $leng = $(".dis.leng"),
+		// 	$radi = $(".dis.radi"),
+		// 	$phai = $(".dis.phai"),
+		// 	$sita = $(".dis.sita")
+		// $leng.val(runway.checkPoint.length-progress).trigger("change")
+		// $radi.val(displacement.length()/craft.radius-1).trigger("change")
+		// $phai.val(displacement.phai()).trigger("change")
+		// $sita.val(displacement.sita()).trigger("change")
+
+		// var $x = $(".rot.x"),
+		// 	$y = $(".rot.y"),
+		// 	$z = $(".rot.z")
+		// $x.val(craft.rotation.x).trigger("change")	
+		// $y.val(craft.rotation.y).trigger("change")
+		// $z.val(craft.rotation.z).trigger("change")
 	}
 
 	function flash(){	
@@ -382,19 +830,31 @@
 		dt=timer.getDelta()
 		tt=timer.getElapsedTime()
 
-		if(runway.sensor(progress)==true){
-			progress+=1
-			if(progress==runway.children.length){
-				timre.stop()
-				progress=0
+		if(runway.checkPoint.length>progress){
+			if(runway.sensor(progress)==true){	
+					progress+=1
+					runway.resetColor(progress)
 			}
-			runway.resetColor(progress)
 		}
 
+		triggerBlockly().cpu_run()
+
+		craft.force.set(0,0,0)
+		craft.torque.set(0,0,0)
+		for(var i=0;i<craft.engines.length;i++){
+			if(craft.engines[i].visible==false){continue}
+			craft.force.add(
+				craft.engines[i].force.clone()					 
+			)
+			craft.torque.add(
+				craft.engines[i].torque.clone()
+			)
+		}
+
+
 		craft.accelera=craft.force.clone().divideScalar(craft.mass)
-		craft.rotaAcce=craft.torque.clone().applyMatrix4(craft.invIner) // !! not correct
-		eular=craft.rotation
-		craft.accelera.applyEuler(eular)
+		craft.rotaAcce=craft.torque.clone().applyMatrix4(craft.invIner) // !! not correct 
+		craft.accelera.applyEuler(craft.rotation)
 
 		dv=craft.accelera.clone()
 		dv.multiplyScalar(dt)
@@ -402,6 +862,7 @@
 		dx=craft.velocity.clone()
 		dx.multiplyScalar(dt)
 		craft.position.add(dx)
+		// craft.translateOnAxis(dx.clone().normalize(),dx.length())
 
 		drv=craft.rotaAcce.clone()
 		drv.multiplyScalar(dt)
@@ -409,46 +870,166 @@
 		drx=craft.rotaVelo.clone()
 		drx.multiplyScalar(dt)
 		craft.rotateOnAxis(drx.clone().normalize(),drx.length())
+
+		craft.getPosture()
+		console.log(craft.face.format())
 	}
 
+
+	// console.log(cpu_run)
+
+// var myString = function(){
+// 	function cpu_run(){
+// 		var v=craft.velocity.clone()
+// 		var p0=craft.position.clone()
+// 		var p1=runway.checkPoint[progress].position.clone()
+// 		var nv=v.clone().normalize()
+// 		var nd=p1.clone().sub(p0).normalize()
+// 		var dd=nd.clone().sub(nv)
+		
+// 		if(v.length()<10){dd=nd}
+
+
+// 		if(dd.x>0){
+// 			craft.switchEngine('left',true)
+// 			craft.switchEngine('right',false)
+// 		}else if(Math.abs(dd.x)<0.1){
+// 			craft.switchEngine('left',false)
+// 			craft.switchEngine('right',false)
+// 		}else{
+// 			craft.switchEngine('left',false)
+// 			craft.switchEngine('right',true)
+// 		}
+
+// 		if(dd.y>0){
+// 			craft.switchEngine('up',true)
+// 			craft.switchEngine('down',false)
+// 		}else if(Math.abs(dd.y)<0.1){
+// 			craft.switchEngine('up',false)
+// 			craft.switchEngine('down',false)
+// 		}else{
+// 			craft.switchEngine('up',false)
+// 			craft.switchEngine('down',true)
+// 		}
+
+
+// 		if(dd.z>0){
+// 			craft.switchEngine('front',true)
+// 			craft.switchEngine('back',false)
+// 		}else if(Math.abs(dd.z)<0.1){
+// 			craft.switchEngine('front',false)
+// 			craft.switchEngine('back',false)
+// 		}else{
+// 			craft.switchEngine('front',false)
+// 			craft.switchEngine('back',true)
+// 		}
+
+// 	}
+// }.toString().slice(14,-3);
+// eval(myString)
+
+	// function cpu_run(){
+	// 	var v=craft.velocity.clone()
+	// 	var p0=craft.position.clone()
+	// 	var p1=runway.checkPoint[progress].position.clone()
+	// 	var nv=v.clone().normalize()
+	// 	var nd=p1.clone().sub(p0).normalize()
+	// 	var dd=nd.clone().sub(nv)
+		
+	// 	if(v.length()<10){dd=nd}
+
+
+	// 	if(dd.x>0){
+	// 		craft.switchEngine('left',true)
+	// 		craft.switchEngine('right',false)
+	// 	}else if(Math.abs(dd.x)<0.1){
+	// 		craft.switchEngine('left',false)
+	// 		craft.switchEngine('right',false)
+	// 	}else{
+	// 		craft.switchEngine('left',false)
+	// 		craft.switchEngine('right',true)
+	// 	}
+
+	// 	if(dd.y>0){
+	// 		craft.switchEngine('up',true)
+	// 		craft.switchEngine('down',false)
+	// 	}else if(Math.abs(dd.y)<0.1){
+	// 		craft.switchEngine('up',false)
+	// 		craft.switchEngine('down',false)
+	// 	}else{
+	// 		craft.switchEngine('up',false)
+	// 		craft.switchEngine('down',true)
+	// 	}
+
+
+	// 	if(dd.z>0){
+	// 		craft.switchEngine('front',true)
+	// 		craft.switchEngine('back',false)
+	// 	}else if(Math.abs(dd.z)<0.1){
+	// 		craft.switchEngine('front',false)
+	// 		craft.switchEngine('back',false)
+	// 	}else{
+	// 		craft.switchEngine('front',false)
+	// 		craft.switchEngine('back',true)
+	// 	}
+
+	// }
+
 	function buildCraft(model){
+		space.remove(craft.pillar)
+		space.remove(craft)
 		craft=new THREE.Object3D()
 		model=new model()
-
-		craft.mass=model.units.length
+		
 		craft.radius=0
-		craft.massCenter=new THREE.Vector3()
+		craft.mass=model.units.length
 		craft.force=new THREE.Vector3()	
 		craft.accelera=new THREE.Vector3()		
 		craft.velocity=new THREE.Vector3()
+
 		craft.inertia=new THREE.Matrix4();
 		craft.torque=new THREE.Vector3()
 		craft.rotaAcce=new THREE.Vector3()
 		craft.rotaVelo=new THREE.Vector3()
 
-		var shift=new THREE.Object3D()
+		craft.left=new THREE.Vector3()
+		craft.head=new THREE.Vector3()
+		craft.face=new THREE.Vector3()
+
+		var frame=new THREE.Object3D()
+			frame.massCenter=new THREE.Vector3()
 		var units=new Array 
 		for(var i=0;i<model.units.length;i++){
-			var material = new THREE.SpriteMaterial({
-				map:UnitTexture(model.units[i].type)
-			} );
-			units[i]=new THREE.Sprite( material );
+			// var material = new THREE.SpriteMaterial({
+			// 	map:UnitTexture(model.units[i].type,model.units[i].color)
+			// } );
+			// units[i]=new THREE.Sprite( material );
+
+			var geometry = new THREE.SphereGeometry(0.5, 16,8 );
+			// var geometry = new THREE.BoxGeometry( 1, 1, 1 );
+			// var material = new THREE.MeshBasicMaterial( {
+			var material = new THREE.MeshLambertMaterial( {
+	          color: model.units[i].color,
+	          // transparent:true,
+	          opacity:0.6,
+	          // specular: 0xff0000, 
+	          emissive: 0x000000,
+	          // alphaMap:
+	        } )
+			units[i] = new THREE.Mesh( geometry, material );
+
 			units[i].position
 				.fromArray(model.units[i].position)
-			shift.add(units[i])
-			craft.massCenter.add(units[i].position)
+			frame.add(units[i])
+			frame.massCenter.add(units[i].position)
 		}
-		craft.massCenter.multiplyScalar(1/craft.mass)
-		console.log(craft.massCenter)
-		
-		
-		console.log(shift )		
+		frame.massCenter.multiplyScalar(1/craft.mass)	
 
 		var xp,yp,zp,rp // position relative to mass center 
 		for(var i=0;i<model.units.length;i++){
-			xp=units[i].position.x-craft.massCenter.x
-			yp=units[i].position.y-craft.massCenter.y
-			zp=units[i].position.z-craft.massCenter.z
+			xp=units[i].position.x-frame.massCenter.x
+			yp=units[i].position.y-frame.massCenter.y
+			zp=units[i].position.z-frame.massCenter.z
 			craft.inertia.elements[0]+= yp*yp+zp*zp
 			craft.inertia.elements[5]+= xp*xp+zp*zp
 			craft.inertia.elements[10]+=xp*xp+yp*yp
@@ -462,58 +1043,96 @@
 		craft.inertia.elements[4]=craft.inertia.elements[1]
 		craft.inertia.elements[8]=craft.inertia.elements[2]
 		craft.inertia.elements[9]=craft.inertia.elements[6]
+		craft.radius=3
 
 		var invIner=new THREE.Matrix4().getInverse(craft.inertia.clone())
 		console.log(craft.mass,craft.inertia,invIner)
 
-		var jets=new Array
-		for(var i=0;i<model.jets.length;i++){
-			var len=model.jets[i].len
-			   ,dir=new THREE.Vector3().fromArray(model.jets[i].dir)
-			   ,end=new THREE.Vector3().fromArray(model.jets[i].end)
-			   ,origin,vector
-			// end.sub(craft.massCenter)
-			vector=dir.clone().multiplyScalar(model.jets[i].len)
+		var engines=new Array
+		for(var i=0;i<model.engines.length;i++){
+			var len=model.engines[i].len
+				 ,dir=new THREE.Vector3().fromArray(model.engines[i].dir)
+				 ,end=new THREE.Vector3().fromArray(model.engines[i].end)
+				 ,origin,vector
+			// end.sub(frame.massCenter)
+			vector=dir.clone().multiplyScalar(model.engines[i].len)
 			origin=end.clone().sub(vector)
-			// jets[i]=CoC.Arrow(origin,vector,0xff0000)
-			jets[i]=fire(end,vector)
-			jets[i].name=model.jets[i].name
-			jets[i].force=dir.clone().multiplyScalar(len*100)
-			jets[i].torque=end.clone().cross(jets[i].force)
-			jets[i].visible=false
-			shift.add(jets[i])
+			// engines[i]=CoC.Arrow(origin,vector,0xff0000)
+			engines[i]=flame(end,vector)
+			engines[i].name=model.engines[i].name
+			engines[i].force=dir.clone().multiplyScalar(len*100)
+			engines[i].torque=end.clone().cross(engines[i].force)
+			engines[i].visible=false
+			frame.add(engines[i])
 		}
+		craft.engines=engines
 	
 		craft.invIner=invIner
-		console.log(shift.position.toArray())
-		shift.position.sub(craft.massCenter)
-		console.log(shift.position.toArray())
-		craft.add(shift)
+		console.log(frame.position.toArray())
+		frame.position.sub(frame.massCenter)
+		console.log(frame.position.toArray())
+		craft.add(frame)
+		craft.frame=frame
 
-		craft.switchJets=function(name,onoff){
-			if(craft.getObjectByName(name).visible==onoff)
-			{return}
-			craft.getObjectByName(name).visible=onoff
+		craft.plotPillar=function(){
+			space.remove(craft.pillar)
+			craft.pillar=new THREE.Line(geometry,material)
+			var geometry,vertex,material ,colors2=[]
+			var x=craft.position.x,
+				y=craft.position.y,
+				z=craft.position.z,
+				r=craft.radius
+
+			geometry=new THREE.Geometry();
+			vertex=new THREE.Vector3();
+			vertex.fromArray([x,y,z])
+			geometry.vertices.push(vertex);
+			colors2[0]=new THREE.Color(0x000000)
+			vertex=new THREE.Vector3();
+			vertex.fromArray([x,0.001,z])
+			geometry.vertices.push(vertex);
+			colors2[1]=new THREE.Color(0xffff00)
 			
-			craft.force.set(0,0,0)
-			craft.torque.set(0,0,0)
-			for(var i=0;i<model.jets.length;i++){
-				if(jets[i].visible==false){continue}
-				craft.force.add(
-					jets[i].force.clone()				   
-				)
-				craft.torque.add(
-					jets[i].torque.clone()
-				)
+			for(i=0;i<=17;i++){
+				vertex=new THREE.Vector3();
+				vertex.fromArray([x+r*Math.cos(i*Math.PI/8),0,z+r*Math.sin(i*Math.PI/8)])
+				geometry.vertices.push(vertex);
+				colors2[i+2]=new THREE.Color(0xffff00)
 			}
-			// craft.accelera=craft.force.clone().divideScalar(craft.mass)
-			// craft.rotaAcce=craft.torque.clone().applyMatrix4(craft.invIner) // !! not correct
-			// eular=craft.rotation
-			// craft.accelera.applyEuler(eular)
+			geometry.colors = colors2;
+			material=new THREE.LineBasicMaterial({vertexColors:THREE.VertexColors});
+			craft.pillar=new THREE.Line(geometry,material)
+			space.add(craft.pillar)
 		}
+		craft.plotPillar()
+
+		craft.switchEngine=function(name,onoff){
+			if(frame.getObjectByName(name).visible==onoff)
+			{return}
+			frame.getObjectByName(name).visible=onoff	
+		}
+
+		craft.getPosture=function(){
+			craft.left=new THREE.Vector3(1,0,0)
+			craft.head=new THREE.Vector3(0,1,0)
+			craft.face=new THREE.Vector3(0,0,1)
+			craft.left.applyEuler(craft.rotation)
+			craft.head.applyEuler(craft.rotation)
+			craft.face.applyEuler(craft.rotation)
+		}
+
+		craft.reset=function(){
+			craft.accelera.set(0,0,0)
+			craft.velocity.set(0,0,0)
+			craft.position.copy(runway.checkPoint[0].position)
+			craft.rotaAcce.set(0,0,0)
+			craft.rotaVelo.set(0,0,0)
+			craft.rotation.set(0,0,0)
+		}
+		space.add(craft)
 	}
 
-	function plotLine(p1,p2){
+	function plotRedLine(p1,p2){
 		var geometry,vertex,material,line
 		geometry=new THREE.Geometry();
 		vertex=new THREE.Vector3();
@@ -530,18 +1149,20 @@
 	}		
 
 	function buildRunway(model){
+		space.remove(runway)
 		var checkPoint=[],connectLine=[]
 		runway=new THREE.Object3D
 		fieldCenter=new THREE.Object3D
 		fieldCenter.position.set(0,20,500)
 
 		for(n=0;n<model.spot.length;n++){
-			checkPoint[n]=makeCheckPoint(model.spot[n].position)			
+			checkPoint[n]=makeCheckPoint(model.spot[n].position)
+			var pillar		
 			if(n>0){
 				var p1,p2
 				p1=model.spot[n].position
 				p2=model.spot[n-1].position
-				connectLine[n]=plotLine(p1,p2)
+				connectLine[n]=plotRedLine(p1,p2)
 			}
 			runway.add(checkPoint[n],connectLine[n])
 		}
@@ -563,19 +1184,19 @@
 
 		runway.resetColor=function(){
 			var p=progress,i
-			if(p==0){
-				for(g=1;g<checkPoint.length;g++){
-					checkPoint[g].visible=true
-					checkPoint[g].children[0].material.color.setHSL(0,0,1)
-					
-					if(g>0){
-						console.log(connectLine[g].geometry)
-						connectLine[g].visible=true
-						connectLine[g].material.color.setRGB(1,0,0)
-					}	
-				}
-				return 0
+			
+			for(g=1;g<checkPoint.length;g++){	
+				checkPoint[g].visible=true
+				checkPoint[g].children[0].material.color.setHSL(0,0,1)
+				
+				if(g>0){
+					// console.log(connectLine[g].geometry)
+					connectLine[g].visible=true
+					connectLine[g].material.color.setRGB(1,0,0)
+				}	
 			}
+
+			if(p==0){return 0}
 
 			checkPoint[0].visible=false
 			for(g=1;g<checkPoint.length;g++){
@@ -588,30 +1209,30 @@
 				if(g>=checkPoint.length){break;}
 				console.log(g)
 				var H=checkPoint[g].children[0].material.color.getHSL().h
-				   ,S=checkPoint[g].children[0].material.color.getHSL().s
-				   ,L=checkPoint[g].children[0].material.color.getHSL().l
+					 ,S=checkPoint[g].children[0].material.color.getHSL().s
+					 ,L=checkPoint[g].children[0].material.color.getHSL().l
 				checkPoint[g].visible=true
 				checkPoint[g].children[0].material.color.setHSL(H,S,1-i*0.2)
 				if(i>0){
 					var H=connectLine[g].material.color.getHSL().h
-					   ,S=connectLine[g].material.color.getHSL().s
-					   ,L=connectLine[g].material.color.getHSL().l
-					connectLine[g].material.color.setHSL(H,S,0.5-i*0.1)   
+						 ,S=connectLine[g].material.color.getHSL().s
+						 ,L=connectLine[g].material.color.getHSL().l
+					connectLine[g].material.color.setHSL(H,S,0.5-i*0.1)	 
 					connectLine[g].visible=true 
 				}
 				i++
 			}
 			
 		}
-		// runway.resetColor(0)
+		space.add(runway)
 	}	
 
 	function makeCheckPoint(position){
 		var geometry,vertex,material,diamond
 		var position,normal,arrow,lineColor=0xffffff
 		var checkPoint=new THREE.Object3D
-		var r=craft.radius
-		r=4
+		var r=craft.radius,h=position[1]
+		
 
 		geometry=new THREE.Geometry();
 		vertex=new THREE.Vector3(0,-r,0);
@@ -639,6 +1260,8 @@
 		vertex=new THREE.Vector3(0,0, r);
 		geometry.vertices.push( vertex );
 		vertex=new THREE.Vector3(0,-r,0);
+		geometry.vertices.push( vertex );
+		vertex=new THREE.Vector3(0,-h,0);
 		geometry.vertices.push( vertex );
 
 		material =new THREE.LineBasicMaterial({
@@ -661,7 +1284,7 @@
 
 		if(head==null){head=length*.2}
 		if(vector.clone().normalize().equals(zz) ||
-		   vector.clone().normalize().negate().equals(zz)){
+			 vector.clone().normalize().negate().equals(zz)){
 			perpen1=new THREE.Vector3(1,0,0)
 			perpen2=new THREE.Vector3(0,1,0)
 		}else{
@@ -696,7 +1319,7 @@
 		return arrow
 	}
 
-	fire=function(end,vector){
+	flame=function(end,vector){
 		var geometry3,vertex, line,colors3 = [];
 
 		geometry3 = new THREE.Geometry()
@@ -711,6 +1334,7 @@
 		colors3[2]=new THREE.Color(0x000000)
 
 		geometry3.colors = colors3;
+		console.log(geometry3)
 
 		material=new THREE.LineBasicMaterial({vertexColors:THREE.VertexColors});
 		material.opacity=0.2
@@ -753,7 +1377,7 @@
 	// 	return lineObj
 	// }
 
-	function setAuxPlane(x1,x2,z1,z2){
+	function buildAuxPlane(x1,x2,z1,z2){
 		var geometry,vertex,material,line
 		auxPlane = new THREE.Object3D
 		for(var i=x1*10;i<=x2*10;i++){
@@ -793,30 +1417,31 @@
 			line = new THREE.Line(geometry,material)
 			auxPlane.add( line );
 		}
+		space.add(auxPlane)
 	}
 
-	function UnitTexture(kind){
+	function UnitTexture(kind,color){
 		var c1,c2 // color outside & inside
 		switch(kind){
-			case  1:c1='#ffffff'		;break; // iron
-			case  2:c1='#333333'		;break; // carbon
-			case  3:c1='#ff0000'		;break; // heat vibrate
-			case  4:c1='#ffff00'		;break; // electromagnetic
-			case  5:c1='#0000ff'		;break; // grvity subspace
+			case	1:c1='#ffffff'		;break; // iron
+			case	2:c1='#333333'		;break; // carbon
+			case	3:c1='#ff0000'		;break; // heat vibrate
+			case	4:c1='#ffff00'		;break; // electromagnetic
+			case	5:c1='#0000ff'		;break; // grvity subspace
 
-			case  6:c1='#ff7575'		;break; // steel
-			case  7:c1='#FFFF6F'		;break; // jet
-			case  8:c1='deepskyblue'	;break; // magnet
-			case  9:c1='sandybrown'	 ;break; // inertia
-			case 10:c1='greenyellow'	;break; // inertia
-			case 11:c1='mediumorchid'   ;break; // inertia
+			case	6:c1='#ff7575'		;break; // steel
+			case	7:c1='#FFFF6F'		;break; // engine
+			case	8:c1='deepskyblue'	;break; // magnet
+			case	9:c1='sandybrown'	 ;break; // inertia
+			case   10:c1='greenyellow'	;break; // inertia
+			case 11:c1='mediumorchid'	 ;break; // inertia
 
 			case 12:c1='silver'		 ;break; // inertia
 
 			case 13:c1='#FF0000'		;break; // inertia
-			case 14:c1='gold'		   ;break; // inertia
+			case 14:c1='gold'			 ;break; // inertia
 			case 15:c1='#2828FF'		;break; // inertia
-			case 16:c1='orangered'	  ;break; // inertia
+			case 16:c1='orangered'		;break; // inertia
 			case 17:c1='#00FF00'		;break; // inertia
 			case 18:c1='#9F009F'		;break; // inertia
 
@@ -827,6 +1452,7 @@
 			case 23:c1='#006000'		;break; // inertia
 			case 24:c1='#460046'		;break; // inertia
 		}
+		c1=color
 
 		var canvas=document.createElement('canvas');
 		canvas.width=100;canvas.height=100
@@ -845,45 +1471,35 @@
 		return texture
 	}
 
-	function mousemoveReact(event){
-		// console.log(event)
-		if(event.which==1){
-			renderer.domElement.style.cursor = "none"
-			mouseDx=event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-			mouseDy=event.movementY || event.mozMovementY || event.webkitMovementY || 0;
-			phai+=mouseDx*0.002
-			thita+=mouseDy*0.002
-			if(thita>Math.PI*0.49){thita=Math.PI*0.49}
-			if(thita<-Math.PI*0.49){thita=-Math.PI*0.49}
-		}else{   
-			renderer.domElement.style.cursor = "crosshair"
-		}
-	}
-	function mousewheelHandler(event){
-		// console.log(event.deltaY)
-		mouseDz=event.deltaY
-		radius+=mouseDz/20
-	}	
-
 	function ctrlKernel(event){
-		trigger=false
-		if(event.type=='keydown'){trigger=true}
+		// trigger=false
+		// if(event.type=='keydown'){trigger=true}
 
-		var key=String.fromCharCode(event.keyCode)
-		switch(key){
-		case 'A':
-			craft.switchJets('left',trigger);break;
-		case 'F':
-			craft.switchJets('right',trigger);break;
-		case 'E':
-			craft.switchJets('front',trigger);break;
-		case 'D':
-			craft.switchJets('back',trigger);break;
-		case 'W':
-			craft.switchJets('up',trigger);break;
-		case 'S':
-			craft.switchJets('down',trigger);break;
-		}
+		// var key=String.fromCharCode(event.keyCode)
+
+		// if(key==' '){
+		// 	var xml = Blockly.Xml.workspaceToDom(workspace);
+		// 	var xml_text = Blockly.Xml.domToText(xml);
+		// 	console.log(xml_text)
+		// 	var code = Blockly.JavaScript.workspaceToCode(workspace);
+		// 	console.log(code)
+		// 	console.log(ccKeybroad.press('A'))
+		// }
+
+		// switch(key){
+		// case 'A':
+		// 	craft.switchEngine('left',trigger);break;
+		// case 'F':
+		// 	craft.switchEngine('right',trigger);break;
+		// case 'E':
+		// 	craft.switchEngine('front',trigger);break;
+		// case 'D':
+		// 	craft.switchEngine('back',trigger);break;
+		// case 'W':
+		// 	craft.switchEngine('up',trigger);break;
+		// case 'S':
+		// 	craft.switchEngine('down',trigger);break;
+		// }
 	}
 
 	function ctrlQuad(event){
@@ -893,32 +1509,32 @@
 		var key=String.fromCharCode(event.keyCode)
 		switch(key){
 		case 'A':
-			craft.switchJets('left-up',trigger);
-			craft.switchJets('right-down',trigger);
+			craft.switchEngine('left-up',trigger);
+			craft.switchEngine('right-down',trigger);
 			break;
 		case 'F':
-			craft.switchJets('left-down',trigger);
-			craft.switchJets('right-up',trigger);
+			craft.switchEngine('left-down',trigger);
+			craft.switchEngine('right-up',trigger);
 			break;
 		case 'E':
-			craft.switchJets('front-up',trigger);
-			craft.switchJets('back-down',trigger);
+			craft.switchEngine('front-up',trigger);
+			craft.switchEngine('back-down',trigger);
 			break;
 		case 'D':
-			craft.switchJets('front-down',trigger);
-			craft.switchJets('back-up',trigger);
+			craft.switchEngine('front-down',trigger);
+			craft.switchEngine('back-up',trigger);
 			break;
 		case 'W':
-			craft.switchJets('left-down',trigger);
-			craft.switchJets('right-down',trigger);
-			craft.switchJets('front-down',trigger);
-			craft.switchJets('back-down',trigger);
+			craft.switchEngine('left-down',trigger);
+			craft.switchEngine('right-down',trigger);
+			craft.switchEngine('front-down',trigger);
+			craft.switchEngine('back-down',trigger);
 			break;
 		case 'S':
-			craft.switchJets('left-up',trigger);
-			craft.switchJets('right-up',trigger);
-			craft.switchJets('front-up',trigger);
-			craft.switchJets('back-up',trigger);
+			craft.switchEngine('left-up',trigger);
+			craft.switchEngine('right-up',trigger);
+			craft.switchEngine('front-up',trigger);
+			craft.switchEngine('back-up',trigger);
 			break;
 		}
 	}
@@ -929,155 +1545,65 @@
 		var key=String.fromCharCode(event.keyCode)
 		switch(key){
 		case 'A':
-			craft.switchJets('left-down',trigger);
-			craft.switchJets('right-up',trigger);
+			craft.switchEngine('left-down',trigger);
+			craft.switchEngine('right-up',trigger);
 			break;
 		case 'F':
-			craft.switchJets('left-up',trigger);
-			craft.switchJets('right-down',trigger)
+			craft.switchEngine('left-up',trigger);
+			craft.switchEngine('right-down',trigger)
 			;break;
 		case 'E':
-			craft.switchJets('back-1',trigger);
-			craft.switchJets('back-2',trigger);
-			craft.switchJets('back-3',trigger);
-			craft.switchJets('back-4',trigger);break;
+			craft.switchEngine('back-1',trigger);
+			craft.switchEngine('back-2',trigger);
+			craft.switchEngine('back-3',trigger);
+			craft.switchEngine('back-4',trigger);break;
 		case 'D':
-			craft.switchJets('left-1',trigger);
-			craft.switchJets('right-1',trigger);
-			craft.switchJets('up',trigger);
-			craft.switchJets('down',trigger);break;
+			craft.switchEngine('left-1',trigger);
+			craft.switchEngine('right-1',trigger);
+			craft.switchEngine('up',trigger);
+			craft.switchEngine('down',trigger);break;
 		case 'W':
-			craft.switchJets('up',trigger);
-			craft.switchJets('back-0',trigger);break;
+			craft.switchEngine('up',trigger);
+			craft.switchEngine('back-0',trigger);break;
 		case 'S':
-			craft.switchJets('down',trigger);
-			craft.switchJets('back-0',trigger);break;
+			craft.switchEngine('down',trigger);
+			craft.switchEngine('back-0',trigger);break;
 		case 'Q':
-			craft.switchJets('left-1',trigger);
-			craft.switchJets('back-0',trigger);break;	
+			craft.switchEngine('left-1',trigger);
+			craft.switchEngine('back-0',trigger);break;	
 		case 'R':
-			craft.switchJets('right-1',trigger);
-			craft.switchJets('back-0',trigger);break;
+			craft.switchEngine('right-1',trigger);
+			craft.switchEngine('back-0',trigger);break;
 		}
 	}
 
-	var straight={
-		"cocType":"path",
-		"spot":[
-		{"position":[0,20,-100],"direction":[0,0,1]},
-		{"position":[0,20,-50],"direction":[0,0,1]},
-		{"position":[0,20,  0],"direction":[0,0,1]},
-		{"position":[0,20, 50],"direction":[0,0,1]},
-		{"position":[0,20,100],"direction":[0,0,1]},
-		{"position":[0,20,150],"direction":[0,0,1]},
-		{"position":[0,20,200],"direction":[0,0,1]},
-		{"position":[0,20,250],"direction":[0,0,1]},
-		{"position":[0,20,300],"direction":[0,0,1]},
-		{"position":[0,20,350],"direction":[0,0,1]},
-		{"position":[0,20,400],"direction":[0,0,1]},
-		{"position":[0,20,450],"direction":[0,0,1]},
-		{"position":[0,20,500],"direction":[0,0,1]},
-		{"position":[0,20,550],"direction":[0,0,1]},
-		{"position":[0,20,600],"direction":[0,0,1]},
-		{"position":[0,20,650],"direction":[0,0,1]},
-		{"position":[0,20,700],"direction":[0,0,1]},
-		{"position":[0,20,750],"direction":[0,0,1]},
-		{"position":[0,20,800],"direction":[0,0,1]},
-		{"position":[0,20,850],"direction":[0,0,1]},
-		{"position":[0,20,900],"direction":[0,0,1]},
-		{"position":[0,20,950],"direction":[0,0,1]},
-		{"position":[0,20,1000],"direction":[0,0,1]},
-		]
+	function ctrlMissile(event){
+		trigger=false
+		if(event.type=='keydown'){trigger=true}
+		var key=String.fromCharCode(event.keyCode)
+		switch(key){
+		case 'S':
+			craft.switchEngine('i1',trigger);
+			craft.switchEngine('i2',trigger);
+			craft.switchEngine('i3',trigger);
+			craft.switchEngine('i4',trigger);
+			craft.switchEngine('o1',trigger);
+			craft.switchEngine('o2',trigger);
+			craft.switchEngine('o3',trigger);
+			craft.switchEngine('o4',trigger);break;
+		case 'W':	
+			craft.switchEngine('o2',trigger);break;
+		case 'X':	
+			craft.switchEngine('o1',trigger);break;
+		case 'A':	
+			craft.switchEngine('o4',trigger);break;
+		case 'D':	
+			craft.switchEngine('o3',trigger);break;			
+		}
 	}
-
-	var sawtooth={
-		"cocType":"path",
-		"spot":[
-		{"position":[0,20,-100],"direction":[0,0,1]},
-		{"position":[0,50,-100],"direction":[0,0,1]},
-		{"position":[0,20,  0],"direction":[0,0,1]},
-		{"position":[0,50,  0],"direction":[0,0,1]},
-		{"position":[0,20,100],"direction":[0,0,1]},
-		{"position":[0,50,100],"direction":[0,0,1]},
-		{"position":[0,20,200],"direction":[0,0,1]},
-		{"position":[0,50,200],"direction":[0,0,1]},
-		{"position":[0,20,300],"direction":[0,0,1]},
-		{"position":[0,50,300],"direction":[0,0,1]},
-		{"position":[0,20,400],"direction":[0,0,1]},
-		{"position":[0,50,400],"direction":[0,0,1]},
-		{"position":[0,20,500],"direction":[0,0,1]},
-		{"position":[0,50,500],"direction":[0,0,1]},
-		{"position":[0,20,600],"direction":[0,0,1]},
-		{"position":[0,50,600],"direction":[0,0,1]},
-		{"position":[0,20,700],"direction":[0,0,1]},
-		{"position":[0,50,700],"direction":[0,0,1]},
-		{"position":[0,20,800],"direction":[0,0,1]},
-		{"position":[0,50,800],"direction":[0,0,1]},
-		{"position":[0,20,900],"direction":[0,0,1]},
-		{"position":[0,50,900],"direction":[0,0,1]},
-		{"position":[0,20,1000],"direction":[0,0,1]},
-		]
-	}
-
-	var lightning={
-		"cocType":"path",
-		"spot":[
-		{"position":[   0,20,-100],"direction":[0,0,1]},
-		{"position":[   0,20,-50],"direction":[0,0,1]},
-		{"position":[ 100,20,  0],"direction":[0,0,1]},
-		{"position":[   0,20, 50],"direction":[0,0,1]},
-		{"position":[-100,20,100],"direction":[0,0,1]},
-		{"position":[   0,20,150],"direction":[0,0,1]},
-		{"position":[ 100,20,200],"direction":[0,0,1]},
-		{"position":[   0,20,250],"direction":[0,0,1]},
-		{"position":[-100,20,300],"direction":[0,0,1]},
-		{"position":[   0,20,350],"direction":[0,0,1]},
-		{"position":[ 100,20,400],"direction":[0,0,1]},
-		{"position":[   0,20,450],"direction":[0,0,1]},
-		{"position":[-100,20,500],"direction":[0,0,1]},
-		{"position":[   0,20,550],"direction":[0,0,1]},
-		{"position":[ 100,20,600],"direction":[0,0,1]},
-		{"position":[   0,20,650],"direction":[0,0,1]},
-		{"position":[-100,20,700],"direction":[0,0,1]},
-		{"position":[   0,20,750],"direction":[0,0,1]},
-		{"position":[ 100,20,800],"direction":[0,0,1]},
-		{"position":[   0,20,850],"direction":[0,0,1]},
-		{"position":[-100,20,900],"direction":[0,0,1]},
-		{"position":[   0,20,950],"direction":[0,0,1]},
-		{"position":[ 100,20,1000],"direction":[0,0,1]},
-		]
-	}
-
-	var swinging={
-		"cocType":"path",
-		"spot":[
-		{"position":[   0,20,-100],"direction":[0,0,1]},
-		{"position":[   0,20,-50],"direction":[0,0,1]},
-		{"position":[ 100,50,  0],"direction":[0,0,1]},
-		{"position":[   0,20, 50],"direction":[0,0,1]},
-		{"position":[-100,50,100],"direction":[0,0,1]},
-		{"position":[   0,20,150],"direction":[0,0,1]},
-		{"position":[ 100,50,200],"direction":[0,0,1]},
-		{"position":[   0,20,250],"direction":[0,0,1]},
-		{"position":[-100,50,300],"direction":[0,0,1]},
-		{"position":[   0,20,350],"direction":[0,0,1]},
-		{"position":[ 100,50,400],"direction":[0,0,1]},
-		{"position":[   0,20,450],"direction":[0,0,1]},
-		{"position":[-100,50,500],"direction":[0,0,1]},
-		{"position":[   0,20,550],"direction":[0,0,1]},
-		{"position":[ 100,50,600],"direction":[0,0,1]},
-		{"position":[   0,20,650],"direction":[0,0,1]},
-		{"position":[-100,50,700],"direction":[0,0,1]},
-		{"position":[   0,20,750],"direction":[0,0,1]},
-		{"position":[ 100,50,800],"direction":[0,0,1]},
-		{"position":[   0,20,850],"direction":[0,0,1]},
-		{"position":[-100,50,900],"direction":[0,0,1]},
-		{"position":[   0,20,950],"direction":[0,0,1]},
-		{"position":[ 100,50,1000],"direction":[0,0,1]},
-		]
-	}	
 
 	init();
+	
 </script>
 </body>
 </html>

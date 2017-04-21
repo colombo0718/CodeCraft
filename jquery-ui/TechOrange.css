@@ -500,19 +500,19 @@ body .ui-tooltip {
 	font-size: 15px;
 }
 .ui-widget-content {
-	border-left: 1px solid #2222ff;
+	border-left: 1px solid #ff0000;
 	color: #ffffff;
 	/*background: #000000;*/
-	background:rgba(0,25,25,0);
+	background:rgba(0,0,0,0);
 }
 /*.ui-widget-content a {
 	color: #222222;
 }*/
 .ui-widget-header {
-	border-bottom: 1px solid #2222ff;
-	color: #00ffff;
+	border-bottom: 1px solid #ff0000;
+	color: #ffff00;
 	/*background: #000000;*/
-	background:rgba(0,25,25,0);
+	background:rgba(0,0,0,0);
 	/*font-weight: bold;*/
 }
 /*.ui-widget-header a {
@@ -527,7 +527,7 @@ body .ui-tooltip {
 	border: 1px solid rgba(0,0,0,0); 
 	background: rgba(0,255,255,0);
 	/*font-weight: bold;*/
-	color: #ff00ff;
+	color: #ff8800;
 }
 .ui-state-default a,
 .ui-state-default a:link,
@@ -541,10 +541,10 @@ body .ui-tooltip {
 .ui-state-focus,
 .ui-widget-content .ui-state-focus,
 .ui-widget-header .ui-state-focus {
-	border: 1px solid #ff00ff;
+	border: 1px solid #ff8800;
 	background: rgba(0,255,255,0);
 	/*font-weight: bold;*/
-	color: #ff00ff;
+	color: #ff8800;
 }
 .ui-state-hover a,
 .ui-state-hover a:hover,
@@ -560,7 +560,7 @@ body .ui-tooltip {
 .ui-state-active,
 .ui-widget-content .ui-state-active,
 .ui-widget-header .ui-state-active {
-	border: 1px solid #ff00ff;
+	border: 1px solid #ff0000;
 	background: rgba(0,255,255,0);
 	/*font-weight: bold;*/
 	color: #ffffff;

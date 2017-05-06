@@ -1,0 +1,76 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <title>Gradient test</title>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/three.js/r74/three.min.js"></script>
+</head>
+<script>
+//  from [ http://darrendev.blogspot.tw/2016/03/gradients-in-threejs.html ]
+
+function makeGradientCube(c1, c2, w, d, h, opacity){
+if(typeof opacity === 'undefined')opacity = 1.0;
+if(typeof c1 === 'number')c1 = new THREE.Color( c1 );
+if(typeof c2 === 'number')c2 = new THREE.Color( c2 );
+
+
+var cubeGeometry = new THREE.BoxGeometry(w, h, d,1,2,1);
+var cubeGeometry = new THREE.CylinderGeometry( .5, .5, 2 , 4,2,true);
+
+var cubeMaterial = new THREE.MeshLambertMaterial({
+	transparent:true,
+	opacity:0.6,
+    vertexColors:THREE.VertexColors
+    });
+
+if(opacity < 1.0){
+    cubeMaterial.opacity = opacity;
+    cubeMaterial.transparent = true;
+    }
+cubeGeometry.faces[15].vertexColors = [c2,c2,c2];
+console.log(cubeGeometry.faces[1])
+for(var ix=0;ix<12;++ix){
+    if(ix==4 || ix==5){ //Top edge, all c2
+        // cubeGeometry.faces[ix].vertexColors = [c2,c2,c2];
+        // console.log(cubeGeometry.faces[ix])
+        }
+    else if(ix==6 || ix==7){ //Bottom edge, all c1
+        // cubeGeometry.faces[ix].vertexColors = [c1,c1,c1];
+        }
+    else if(ix%2 ==0){ //First triangle on each side edge
+        // cubeGeometry.faces[ix].vertexColors = [c2,c1,c2];
+        }
+    else{ //Second triangle on each side edge
+        // cubeGeometry.faces[ix].vertexColors = [c1,c1,c2];
+        }
+    }
+
+return new THREE.Mesh(cubeGeometry, cubeMaterial);
+}
+
+function init() {
+  var scene = new THREE.Scene();
+  var camera = new THREE.PerspectiveCamera(45,
+    window.innerWidth / window.innerHeight, 0.1, 1000);
+
+  var renderer = new THREE.WebGLRenderer();
+  renderer.setClearColor(0x000000, 1.0);
+  renderer.setSize(window.innerWidth, window.innerHeight);
+
+  var dirLight = new THREE.DirectionalLight();
+  dirLight.position.set(30, 10, 20);
+  scene.add(dirLight);
+
+  scene.add( makeGradientCube(0xffffff, 0xff00ff, 1,1,6, 1.0) );
+
+  camera.position.set( 10,0,0);
+  camera.lookAt(scene.position);
+
+  document.body.appendChild(renderer.domElement);
+  renderer.render(scene, camera);
+  }
+
+window.onload = init;
+</script>
+<body>
+</body>
+</html>

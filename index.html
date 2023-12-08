@@ -401,9 +401,12 @@
 			}
 			}
 	})
+
+	// change craft
 	$('#selectCraft').dialog('close')
 
 		$("#kernel").button().click(function(){
+			$("#assistInfo").html('try WS AF ED button');
 			buildCraft(kernel)
 			craft.reset()
 			// craft.plotPillar()
@@ -412,6 +415,7 @@
 			document.addEventListener('keyup', ctrlKernel, false );
 		})
 		$("#quad").button().click(function(){
+			$("#assistInfo").html('try WS AF ED button');
 			buildCraft(quadcopter)
 			craft.reset()
 			// craft.plotPillar()
@@ -420,6 +424,7 @@
 			document.addEventListener('keyup', ctrlQuad, false );
 		})
 		$("#fighter").button().click(function(){
+			$("#assistInfo").html('try WS AF ED QR button');
 			buildCraft(fighter)
 			craft.reset()
 			// craft.plotPillar()
@@ -428,6 +433,7 @@
 			document.addEventListener('keyup', ctrlFight, false );
 		})
 		$("#missile").button().click(function(){
+			$("#assistInfo").html('try WX AD S button');
 			buildCraft(missile)
 			craft.reset()
 			// craft.plotPillar()
@@ -1490,6 +1496,7 @@
 			console.log(code)
 			console.log(ccKeybroad.press('A'))
 		}
+		
 
 		switch(key){
 		case 'A':
@@ -1583,6 +1590,7 @@
 	}
 
 	function ctrlMissile(event){
+		
 		trigger=false
 		if(event.type=='keydown'){trigger=true}
 		var key=String.fromCharCode(event.keyCode)
